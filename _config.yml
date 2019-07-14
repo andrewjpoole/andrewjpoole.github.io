@@ -6,10 +6,10 @@
 name: Andrew Poole
 
 # Short bio or description (displayed in the header)
-description: I am a Christian, a husband, a father and a bass guitarist and software developer, I love C#, working in teams, architecture, dotNetCore, building distributed microservice based systems, tools suchas ElasticSearch, Consul.
+description: I am a Christian, a husband, a father and a bass guitarist and software developer, I love C#, working in teams, architecture, dotNetCore, building distributed microservice based systems, tools such as Eventstore, ElasticSearch, Consul.
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png
+avatar: https://avatars3.githubusercontent.com/u/13016943?v=4
 
 #
 # Flags below are optional
@@ -21,12 +21,12 @@ footer-links:
   email:
   facebook:
   flickr:
-  github: barryclark/jekyll-now
+  github: andrewjpoole
   instagram:
-  linkedin:
+  linkedin:andrew-poole-2782494a
   pinterest:
   rss: # just type anything here for a working RSS icon
-  twitter: jekyllrb
+  twitter: AndrewP74683044
   stackoverflow: # your stackoverflow profile, e.g. "users/50476/bart-kiers"
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/
