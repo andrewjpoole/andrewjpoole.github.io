@@ -22,7 +22,7 @@ I am very interested in DDD, Onion architecture and Event Sourcing.
 ### Music
 I love music. I love the creativity and collaboration. I love a funky groove where drummer and bassist are clearly having fun! 
 I play 6 string bass fairly well, I dabble with guitars and keyboards and very occaisionally with drums/cajon etc. I also sing and I play regularly at church.
-I love music technology, whether its live sound or recording.
+I love music technology, whether it's live sound or recording.
 I wanted to pusue a career in music when I was younger, but I have spent enough hours in the studio with a terrible headache to realise that I would have spoiled an enjoyable hobby!
 
 ### Contact me
