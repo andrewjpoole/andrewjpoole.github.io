@@ -5,10 +5,11 @@ permalink: /about/
 ---
 ### Faith
 I am a Christian. The Christian faith is simultaneously massive and deep enough to spend a lifetime comtemplating and simple enough for a child to understand. I think it can be boiled down to the following:
-* Life starts with God, who is responsible for creation and loves every one of us.
-* People stuffed it up, not God. We have let Him down and there is a heavy price to pay and no way for us to pay it.
-* God made a way, by paying the price Himself, by punishing His own son Jesus in our place.
-* All we have to do is accept our own failure and position before God, to trust in Jesus's work on the cross and try to live life in a way that pleases God. Then when God looks at us he judges us by Jesus's perfect record - which is amazing!
+- Life starts with God, who is responsible for creation and loves every one of us.
+- People stuffed it up, not God. We have let Him down and there is a heavy price to pay and no way for us to pay it.
+- God made a way, by paying the price Himself, by punishing His own son Jesus in our place.
+- All we have to do is accept our own failure and position before God, to trust in Jesus's work on the cross and try to live life in a way that pleases God. Then when God looks at us he judges us by Jesus's perfect record - which is amazing!
+
 I believe this because I find it be the only way I make sense of this crazy world and the evil in it. 
 I dont accept that we can explain everything via science, I see inside myself more than just knowledge and information, I see emotion, vulnerability, creativity, motives good and bad etc... 
 I think it takes as much faith to believe fully in evolution as it does to believe in creation.
