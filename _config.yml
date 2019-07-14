@@ -3,10 +3,10 @@
 #
 
 # Name of your site (displayed in the header)
-name: Your Name
+name: Andrew Poole
 
 # Short bio or description (displayed in the header)
-description: Web Developer from Somewhere
+description: I am a Christian, a husband, a father and a bass guitarist and software developer, I love C#, working in teams, architecture, dotNetCore, building distributed microservice based systems, tools suchas ElasticSearch, Consul.
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png
