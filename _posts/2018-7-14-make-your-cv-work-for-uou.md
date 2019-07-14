@@ -9,9 +9,9 @@ Some things happened at work recently whihc made me wonder whether it was time t
 I never intended to stay at one company for 5 1/2 years, but I did get a promotion from senior to lead 3 1/2 years ago and was committed to staying for the duration of a large project which was likely to last another 2 years.
 However, I always intended to go to the odd practice interview, but never managed it. So I thought I'd update my CV, change my LinkedIn status and see what happens.
 The things at work were winding me up quite a lot, to the point of losing sleep. 
-One particular sleepless night, with everything wutling around in my mind, I was wondering how I would try to find my next company.
-I had learned through the course of several past jobs and projects, quite a few things that I did and did not like, but the tricky bit seemed to be how would I measure a prospective company against those opinions in the time it takes to have an interview?
-Then I had the idea of creating my ideal 'Company Spec', I sat up, fired up my laptop and started typing, exactly one hour later having dumped all my thoughts, I finally dropped off to sleep.
+One particular sleepless night, with everything wurling around in my mind, I was wondering how I would try to find my next company.
+I had learned through the course of several past jobs and projects quite a few things that I did and did not like, but the tricky bit seemed to be how would I measure a prospective company against those opinions in the time it takes to have an interview?
+Then I had the idea of creating my ideal 'Company Spec', I sat up in bed, fired up my laptop and started typing, exactly one hour later having dumped all my thoughts, I finally dropped off to sleep, feeling much better.
 
 ### Company spec
 What I meant was a set of points describing what I wanted from my next employer in the same way that an employer would describe what they wanted in their next employee.
