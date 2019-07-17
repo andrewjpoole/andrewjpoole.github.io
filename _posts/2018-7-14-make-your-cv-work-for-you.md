@@ -36,7 +36,7 @@ By the end of the interview and certainly by the time I received an offer, we ha
 The other thing I did was to place a short section about an interesting side project and what progress I'd made with it. In my case I am convinced that private network blockchain can solve the problem of consensus in a distributed system without needing a leader, so I have a project in which I am trying to prove it. I am also using my project to learn about containers and Azure, both of which I haven't used much in a commercial context.
 I supposed a decent open source projects would be even better, but any interesting project or problem to solve would work. As long as you can talk about it confidently when the questions come, I talked about my intentions for future architecture and some stretch goals. I think this would be especially useful if the projects you have been working on are not utilising modern architectures, as it shows awareness of modern design patterns and a bit of initiative on your part to go above and beyond to learn them.
 
-## Both of these are really just a way of steering the conversation to something you can talk about enthusiastically 
+## Both of these are really just a way of steering the conversation to something you can talk about enthusiastically
 
 My final CV layout was:
 
@@ -50,14 +50,14 @@ My final CV layout was:
 
 ## The actual company spec section I included
 
-Probably not best to copy mine, but this is what worked for me
+Probably not best to copy mine as you'll need to talk about them and the experiences good and bad which lead you to the opinion, but this is what worked for me:
 
 > I wanted to do something a little different with my CV, so I am including my ideal ‘Company Spec’
-> 
+>
 > ### ORGANISATIONAL AND TEAM CULTURE
-> 
+>
 > I want to work for an organisation where:
-> 
+>
 > - Software engineering is known to be a team sport, where strong and stable teams are built and
 > empowered / trusted to design, implement, deploy and support solutions to well defined business
 > needs. Supported by good solution architecture.
@@ -77,12 +77,12 @@ Probably not best to copy mine, but this is what worked for me
 > - Small and frequent incremental deployments, progressing all the way to production are preferred to
 > big bang releases and change management process are lightweight (trust, verify).
 > - There is a technical career path
-> 
-> 
+>
+>
 > ## TECHNOLOGY APPROACHES
-> 
+>
 > I want to work for an organisation where:
-> 
+>
 > - The default language is C# and all current and new development defaults to DotNetCore
 > - Security is taken seriously
 > - The best tools are used for the job and sometimes these are COTS i.e. ElasticSearch, Consul etc
