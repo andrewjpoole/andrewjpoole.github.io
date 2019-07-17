@@ -28,6 +28,8 @@ I switched to considering the similarities of a software engineering team and a 
 
 Playing in a band can be one of the greatest things in life. I am going to focus on what it is that makes a great experience of playing a song in a band, when everything works and a lovely piece of music is the result. I'm thinking about a band with guitars and drums rather than say a brass band or orchestra, although I guess the same applies.
 
+![alt text](..\images\DMB2013.jpg "Dave Matthews Band, May 2013")
+
 So we have a drummer and a bass player, together they form the rhythm section and are responsible for setting the tempo and laying down the groove which everyone will play to. Tempo is just speed and a groove is a repeating pattern, which has a rhythm and sets the 'feel' of the song. The whole band probably contribute to the characteristics of the groove but the rhythm section 'lay it down' and are responsible for it.
 Next we have guitar parts and maybe piano or keyboard parts, these would pick up the groove somehow and add some richness to the overall sound. These parts may be towards the back of the mix blending in, or they might be quite prominent. Over everything else we have vocals.
 
