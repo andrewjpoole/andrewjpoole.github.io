@@ -30,9 +30,6 @@ Playing in a band can be one of the greatest things in life. I am going to focus
 
 ![alt text](..\images\DMB2013.jpg "Dave Matthews Band, May 2013")
 
-So we have a drummer and a bass player, together they form the rhythm section and are responsible for setting the tempo and laying down the groove which everyone will play to. Tempo is just speed and a groove is a repeating pattern, which has a rhythm and sets the 'feel' of the song. The whole band probably contribute to the characteristics of the groove but the rhythm section 'lay it down' and are responsible for it.
-Next we have guitar parts and maybe piano or keyboard parts, these would pick up the groove somehow and add some richness to the overall sound. These parts may be towards the back of the mix blending in, or they might be quite prominent. Over everything else we have vocals.
-
 #### The Groove
 
 A song will have a 'groove' which is a kind of rhythmic repeating pattern which is established by the drummer and bass player. In western music, which is normally structured in 8 bar sections, there would probably be different grooves for different sections of a given song, one for the verses, one for choruses and another for the bridge etc. The groove sets the 'feel' of the song and will be influenced by the style of the music and/or other songs or favourite artists. For instance, in Reggae music the groove is usually swung and places a heavy emphasis on the off beat, whereas in a rock groove it is normally played straight and there is a kick on beats 1 and 3 and a snare on 2 and 4. At the end of a section there would normally be some kind of fill which is where the drummer and/or bass player would play a something slightly different usually ending in a hit on a cymbal. The groove also has a tempo, which is the speed at which the song is played.
