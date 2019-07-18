@@ -4,7 +4,8 @@ title: Parallels between software and music
 published: true
 ---
 
-I was recently challenged during a one-to-one with my mentor at work to write a blog about the links/parallels between software development and music. My mentor has an interest in the promotion of STEM and STEAM (science, technology, engineering, arts and maths). I thought this was an interesting idea so I'm having a go! Its turned out a bit longer than I intended.
+I was recently challenged during a one-to-one with my mentor at work to write a blog about the links/parallels between software development and music. My mentor has an interest in the promotion of STEM (science, technology, engineering, arts and maths) and STEAM (which adds arts in too). I thought this was an interesting idea so I'm having a go!
+The first thing that pops into my head when I think about software engineering OR when I think about music is creativity...
 
 ### Creativity
 
@@ -14,7 +15,7 @@ From my personal experience, I see a strong link between my ~~obsession with~~ c
 
 What I'm not sure about is whether the Lego gave me that creativity or just gave expression to it. My son likes Lego but not in the same way I loved it. I see a similar thing with children who love Minecraft.
 
-Anyway, back to music. Music is obviously a creative thing, although slavishly learning piano pieces for an exam is certainly not fun. I learnt trumpet classically to the point where I could read music by sight fairly well, even transposing into different keys, but I was so frustrated that I couldn't improvise to save my life! I always longed to be able to improvise! I certainly enjoyed playing music in a group where the sheet music was the key to transforming a set of individual solo efforts into something that was more than the sum of the parts. That was definitely still a creative thing, but different to creating something from scratch. Similar to building the official Lego models.
+Anyway, back to music. Music is obviously a hugely creative thing, although slavishly learning piano pieces for an exam is certainly not fun. I learnt trumpet classically to the point where I could read music by sight fairly well, even transposing into different keys, but I was so frustrated that I couldn't improvise to save my life! I always longed to be able to improvise! I certainly enjoyed playing music in a group where the sheet music was the key to transforming a set of individual solo efforts into something that was more than the sum of the parts. That was definitely still a creative thing, but different to creating something from scratch. Similar to building the official Lego models.
 
 ### Personal software development practice and personally playing an instrument
 
