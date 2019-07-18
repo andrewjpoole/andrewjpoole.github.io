@@ -4,8 +4,6 @@ title: Parallels between software and music
 published: true
 ---
 
-## A challenge
-
 I was recently challenged during a one-to-one with my mentor at work to write a blog about the links/parallels between software development and music. My mentor has an interest in the promotion of STEM and STEAM (science, technology, engineering, arts and maths). I thought this was an interesting idea so I'm having a go! Its turned out a bit longer than I intended.
 
 ### Creativity

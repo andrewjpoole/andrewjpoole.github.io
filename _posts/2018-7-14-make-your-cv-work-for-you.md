@@ -4,9 +4,7 @@ title: Make your CV work for you!
 published: true
 ---
 
-## Time to update my CV
-
-Some things happened at work recently which made me wonder whether it was time to think about moving on.
+Some things happened at work recently which made me wonder whether it was time to think about updating my CV and moving on.
 I never intended to stay at one company for 5 1/2 years, but I did get a promotion from senior to lead 3 1/2 years ago and was committed to staying for the duration of a large project which was likely to last another 2 years.
 However, I always intended to go to the odd practice interview, but never managed it. So I thought I'd update my CV, change my LinkedIn status and see what happens.
 The things at work were winding me up quite a lot, to the point of losing sleep.
