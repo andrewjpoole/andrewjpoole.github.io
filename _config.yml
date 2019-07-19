@@ -18,7 +18,7 @@ title: Fork in the code
 email: 
 description: "Andrew Poole's random thoughts mostly about software engineering"
 baseurl: # the optional subpath of your site, e.g. "/blog"
-url: https://forkinthecode.net
+url: https://andrewjpoole.github.io/ # https://www.forkinthecode.net
 author:
   name: Andrew Poole
   twitter: AndrewP74683044
