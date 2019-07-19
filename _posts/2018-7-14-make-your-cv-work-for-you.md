@@ -52,48 +52,7 @@ My final CV layout was:
 
 Probably not best to copy mine as you'll need to talk about them and the experiences good and bad which lead you to the opinion, but this is what worked for me:
 
-> I wanted to do something a little different with my CV, so I am including my ideal ‘Company Spec’
->
-> ### ORGANISATIONAL AND TEAM CULTURE
->
-> I want to work for an organisation where:
->
-> - Software engineering is known to be a team sport, where strong and stable teams are built and
-> empowered / trusted to design, implement, deploy and support solutions to well defined business
-> needs. Supported by good solution architecture.
-> - Team members are expected to enjoy, take pride in and have a personal sense of investment in the
-> work that the team undertakes. Work should involve fun.
-> - Technical leads are there to inspire, encourage, support and develop team members, to lead in
-> technical direction / design and to guard, maintain and be accountable for upholding quality and
-> standards. But all members of the team are expected to contribute ideas, concerns and questions, of
-> which all are valued, respected and taken seriously.
-> - Innovation and creativity is encouraged and time given to try out good ideas, understanding that the
-> personal sense of continuous improvement impact and ownership that it gives people makes for happy
-> and engaged team members and therefore happy and healthy teams. Time and resources are made
-> available for training
-> - Business ideas/decisions have sufficient technical input at an early stage to ensure feasibility before
-> work begins. Failure is learned from, rather than punished. Estimates have a confidence rating
-> attached and come from the team considering the work rather than from the business.
-> - Small and frequent incremental deployments, progressing all the way to production are preferred to
-> big bang releases and change management process are lightweight (trust, verify).
-> - There is a technical career path
->
->
-> ## TECHNOLOGY APPROACHES
->
-> I want to work for an organisation where:
->
-> - The default language is C# and all current and new development defaults to DotNetCore
-> - Security is taken seriously
-> - The best tools are used for the job and sometimes these are COTS i.e. ElasticSearch, Consul etc
-> - Reusable Single-responsibility services that do one job well are favoured over adding another feature
-> to the monolith
-> - Old applications are replaced and retired successfully
-> - Modern approaches/tooling/frameworks are utilised where appropriate (CQRS, Event sourcing for
-> instance) but not just because they are new and shiny (flavourofthemonth.js)
-> - Cross-cutting concerns (logging, monitoring, metrics, centralised config, secrets management etc) are
-> first class citizens alongside features
-> - Significant and/or important systems should be distributed from the outset
+![alt text](..\images\CompanySpec.jpg "Screenshot of my Company Spec, from my CV")
 
 ## In Conclusion
 
