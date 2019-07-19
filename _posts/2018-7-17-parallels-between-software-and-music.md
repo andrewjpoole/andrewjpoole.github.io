@@ -2,6 +2,9 @@
 layout: post
 title: Parallels between software and music
 published: true
+tags:
+  - music
+  - HealthyTeams
 ---
 
 I was recently challenged during a one-to-one with my mentor at work to write a blog about the links/parallels between software development and music. My mentor has an interest in the promotion of STEM (science, technology, engineering, arts and maths) and STEAM (which adds arts in too). I thought this was an interesting idea so I'm having a go!
@@ -27,7 +30,7 @@ I switched to considering the similarities of a software engineering team and a 
 
 Playing in a band can be one of the greatest things in life. I am going to focus on what it is that makes a great experience of playing a song in a band, when everything works and a lovely piece of music is the result. I'm thinking about a band with guitars and drums rather than say a brass band or orchestra, although I guess the same applies.
 
-![alt text](..\images\DMB2013.jpg "Dave Matthews Band, May 2013")
+![Dave Matthews Band, May 2013](/assets/images/DMB2013.jpg "Dave Matthews Band, May 2013")
 
 #### The Groove
 

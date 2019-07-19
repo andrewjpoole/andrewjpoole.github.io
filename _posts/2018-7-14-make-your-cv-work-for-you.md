@@ -2,6 +2,10 @@
 layout: post
 title: Make your CV work for you!
 published: true
+tags:
+  - CompanySpec
+  - CV tricks
+  - HealthyTeams
 ---
 
 Some things happened at work recently which made me wonder whether it was time to think about moving on.
@@ -52,7 +56,7 @@ My final CV layout was:
 
 Probably not best to copy mine as you'll need to talk about them and the experiences good and bad which lead you to the opinion, but this is what worked for me:
 
-![alt text](..\images\CompanySpec.jpg "Screenshot of my Company Spec, from my CV")
+![Screenshot of my Company Spec, from my CV](/assets/images/CompanySpec.jpg "Screenshot of my Company Spec, from my CV")
 
 ## In Conclusion
 

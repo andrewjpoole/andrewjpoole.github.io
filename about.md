@@ -27,4 +27,4 @@ I wanted to pusue a career in music when I was younger, but I have spent enough 
 
 ### Contact me
 
-Please contact me via Twitter or LinkedIn using the links at the bottom.
+Please contact me via Twitter or LinkedIn using the links in the menu.
