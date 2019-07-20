@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 lang: en-GB
-title: Fork in the code
+title: a fork in the code
 email: 
 description: "Andrew Poole's random thoughts mostly about software engineering"
 baseurl: # the optional subpath of your site, e.g. "/blog"
