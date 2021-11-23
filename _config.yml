@@ -89,3 +89,5 @@ defaults:
     values:
       layout: post
       read_time: true
+
+theme: jekyll-theme-cayman
