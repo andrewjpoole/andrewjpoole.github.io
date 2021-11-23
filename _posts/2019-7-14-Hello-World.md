@@ -11,8 +11,3 @@ markdown, github pages and Jekyll are awesome!!
 // a comment
 var x = DateTime.Now();
 ```
-
-~~~ CSharp
-// a comment
-var x = DateTime.Now();
-~~~
