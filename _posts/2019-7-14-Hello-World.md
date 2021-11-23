@@ -7,7 +7,7 @@ published: true
 # My first test post!
 markdown, github pages and Jekyll are awesome!!
 
-``` CSharp
+```csharp
 // a comment
 var x = DateTime.Now();
 ```
