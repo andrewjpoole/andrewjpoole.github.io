@@ -37,7 +37,7 @@ When we create the artificial `ServiceBusReceivedMessage` it needs to be package
 
 ### Here is our `TestableProcessMessageEventArgs` class
 
-```CSharp
+```csharp
 public class TestableProcessMessageEventArgs : ProcessMessageEventArgs
 {
     public bool WasCompleted{ get; private set; }
@@ -80,7 +80,7 @@ We can add a couple of helpful features to the `TestableServiceBusProcessor` suc
 
 ### Here is our `TestableServiceBusProcessor` class
 
-```CSharp
+```csharp
 public class TestableServiceBusProcessor : ServiceBusProcessor
 {
     public List<TestableProcessMessageEventArgs> MessageDeliveryAttempts = new();
@@ -132,7 +132,7 @@ public class TestableServiceBusProcessor : ServiceBusProcessor
 
 So, to use these classes in a component test, we can use the excellent `TestHost` from the `Microsoft.AspNetCore.TestHost` package, this enables us to run a service in memory, calling the `ConfigureServices` method as normal, but then overriding some of the configurations i.e. the ones that touch the network that we need to mock. Consider the following code:
 
-```CSharp
+```csharp
 public class TestHost : IDisposable
 {
     private readonly IHost _server;
@@ -189,7 +189,7 @@ Finally we have a Mock `IWidget` service, which our message handler calls and we
 
 The following code shows the actual tests, we decided to split the setup, execution and assertion into a set of helpers named `Given`, `When` and `Then`, this allows for a nice fluent interface for the tests and makes them nice and readable.
 
-```CSharp
+```csharp
 [Fact]
 public void a_message_sent_to_the_queue_is_handled_and_completed()
 {
@@ -249,7 +249,7 @@ public void a_message_sent_to_the_queue_is_handled_and_when_transientException_i
 
 Here is the code for the `When` class which simulates the message appearing on the queue
 
-```CSharp
+```csharp
 public class When
 {
     private readonly TestHost _host;
@@ -277,7 +277,7 @@ public class When
 ```
 And here is the code for the `Then` class which demonstrates how to use the `TestableServiceBusProcessor` and its collection of `MessageDeliveryAttempts`, each of which contains a `TestableProcessMessageEventArgs` that be can used to make assertions. We are using the `FluentAssertions` package.
 
-```CSharp
+```csharp
 public class Then
 {
     private readonly TestHost _host;
