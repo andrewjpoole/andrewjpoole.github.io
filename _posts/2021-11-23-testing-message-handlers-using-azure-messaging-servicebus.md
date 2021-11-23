@@ -2,7 +2,7 @@
 layout: post
 title: Testing Service Bus Handlers using Azure.Messaging.ServiceBus
 image: /assets/images/bust_tilt_testing.jpg
-published: false
+published: true
 tags:
   - testing
   - service bus
