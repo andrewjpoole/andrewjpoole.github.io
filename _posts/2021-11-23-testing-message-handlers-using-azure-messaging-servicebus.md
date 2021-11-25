@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Testing Service Bus Handlers using Azure.Messaging.ServiceBus
+title: Testing Service Bus Handlers using Azure.Messaging.ServiceBus client library
 image: /images/bust_tilt_testing.jpg
 published: false
 tags:
@@ -9,8 +9,6 @@ tags:
   - azure
   - component tests
 ---
-
-# Testing Azure Service Bus Handlers using `Azure.Messaging.ServiceBus` Client Library
 
 TL/DR - At ClearBank we love testing and the new `Azure.Messaging.ServiceBus` package makes testing Service Bus handlers easy at last! Check out how we did it.
 

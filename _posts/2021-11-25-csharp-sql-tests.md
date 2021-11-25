@@ -5,8 +5,6 @@ image: /images/csharpsqltests.jpg
 published: true
 ---
 
-# C# Sql Tests
-
 TL/DR You know you should be testing stored procedures/complex queries etc, if you're underwhelmed by the T-Sql based frameworks available you might like to use a nice fluent C# framework which makes it easy to run tests against a temporary localDb instance, with a DacPac deployed, in a handy SqlTransaction per test and using markdown table syntax to define data! If so read on...
 
 ## Background
