@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Testing Service Bus Handlers using Azure.Messaging.ServiceBus
-image: /assets/images/bust_tilt_testing.jpg
+image: /images/bust_tilt_testing.jpg
 published: false
 tags:
   - testing
@@ -183,7 +183,7 @@ public class TestHost : IDisposable
 So we're using Moq to create a Mock `ServiceBusClient`, this will be registered into the DI container and when it's `CreateProcessor()` method is called with the correct queue name, an instance of our `TestableServiceBusProcessor` will be returned. We are also setting up a Mock `ServiceBusSender` which we can use later to Assert whether messages were sent to a different queue.
 Finally we have a Mock `IWidget` service, which our message handler calls and we can use to throw exceptions or simulate processing delays etc.
 
-![Sequence diagram](/assets/images//testing_azure_service_bus_message_handlers_using_azure_messaging_servicebus_image1.png)
+![Sequence diagram](/images//testing_azure_service_bus_message_handlers_using_azure_messaging_servicebus_image1.png)
 
 ## The actual tests
 

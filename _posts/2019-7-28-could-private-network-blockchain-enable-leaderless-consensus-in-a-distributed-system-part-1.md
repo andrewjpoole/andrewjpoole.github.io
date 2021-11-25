@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Could private network Blockchain enable leaderless consensus in a distributed system? part 1
-image: /assets/images/chain.jpg
+image: /images/chain.jpg
 published: true
 tags:
   - blockchain
@@ -41,7 +41,7 @@ So, as long as there are a number of chains (and preferably an odd number) _and_
 
 In a crypto currency, there is a large public network of nodes, in fact anyone can run a node and have a copy of the chain. The source of truth is therefore completely decentralised and as long as no one party owns more than 50% of the nodes, the system can be trusted.
 
-![Blockchain Mining rig](/assets/images/miningrig.jpg "Picture of a Blockchain Mining rig")
+![Blockchain Mining rig](/images/miningrig.jpg "Picture of a Blockchain Mining rig")
 Public network Blockchain also has a concept called 'proof of work' which makes it non trivial to be able to create the next block, one example is that the hash must start with a certain number of leading zeros, this is where the concept of mining comes from. A number called a nonce is added to the block and if the hash doesn't meet the constraint (e.g. starting with 11 zeros) the nonce would be incremented and the hash recalculated, this happens repeatedly until the hash meets the constraint. This would probably mean that a special piece of code running on a high-end graphics card on a 'mining rig' would have been churning out millions of hashes for about 10 minutes before the next block was found. This is a very simplified explanation, in BitCoin for instance there is also a confirmation process explained [here](https://coincenter.org/entry/how-long-does-it-take-for-a-bitcoin-transaction-to-be-confirmed)
 
 Its this trust that makes public network blockchain potentially useful for things like currency, banking/financial stuff, supply chain provenance, asset tracking, contracts, medical records etc and loads more.

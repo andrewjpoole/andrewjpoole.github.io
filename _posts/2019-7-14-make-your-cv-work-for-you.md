@@ -56,7 +56,7 @@ My final CV layout was:
 
 Probably not best to copy mine as you'll need to talk about them and the experiences good and bad which lead you to the opinion, but this is what worked for me:
 
-![Screenshot of my Company Spec, from my CV](/assets/images/CompanySpec.jpg "Screenshot of my Company Spec, from my CV")
+![Screenshot of my Company Spec, from my CV](/images/CompanySpec.jpg "Screenshot of my Company Spec, from my CV")
 
 ## In Conclusion
 

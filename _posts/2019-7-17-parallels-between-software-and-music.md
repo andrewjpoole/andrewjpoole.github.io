@@ -30,7 +30,7 @@ I switched to considering the similarities of a software engineering team and a 
 
 Playing in a band can be one of the greatest things in life. I am going to focus on what it is that makes a great experience of playing a song in a band, when everything works and a lovely piece of music is the result. I'm thinking about a band with guitars and drums rather than say a brass band or orchestra, although I guess the same applies.
 
-![Dave Matthews Band, May 2013](/assets/images/DMB2013.jpg "Dave Matthews Band, May 2013")
+![Dave Matthews Band, May 2013](/images/DMB2013.jpg "Dave Matthews Band, May 2013")
 
 #### The Groove
 
