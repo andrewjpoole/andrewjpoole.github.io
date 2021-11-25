@@ -1,7 +1,8 @@
 ---
 layout: post
 title: CSharp Sql Tests
-published: false
+image: /images/csharpsqltests.jpg
+published: true
 ---
 
 # C# Sql Tests
