@@ -46,11 +46,11 @@ feed:
 
 highlighter: rouge
 
-# Markdown Processors
-kramdown:
-  input: GFM
-  auto_ids: true
-  syntax_highlighter: rouge
+# # Markdown Processors
+# kramdown:
+#   input: GFM
+#   auto_ids: true
+#   syntax_highlighter: rouge
 
 # Pagination - https://jekyllrb.com/docs/pagination/
 paginate: 10
@@ -90,4 +90,5 @@ defaults:
       layout: post
       read_time: true
 
-theme: jekyll-theme-cayman
+#theme: jekyll-theme-cayman
+remote_theme: "mmistakes/jekyll-theme-basically-basic@1.4.5"
