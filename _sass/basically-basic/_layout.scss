@@ -67,7 +67,7 @@ main {
 .layout--post,
 .layout--page {
   .entry-content {
-    @include breakpoint($large) {
+    @include breakpoint($xlarge) {
       width: span(14 of 16);
     }
   }
