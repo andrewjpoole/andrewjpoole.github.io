@@ -2,7 +2,7 @@
 layout: post
 title: CSharp Sql Tests
 image: /images/csharpsqltests.jpg
-published: true
+published: false
 ---
 
 TL/DR You know you should be testing stored procedures/complex queries etc, if you're underwhelmed by the T-Sql based frameworks available you might like to use a nice fluent C# framework which makes it easy to run tests against a temporary localDb instance, with a DacPac deployed, in a handy SqlTransaction per test and using markdown table syntax to define data! If so read on...
@@ -26,9 +26,9 @@ public void test_asserting_using_contains()
     _context.RunTest((connection, transaction) =>
     {
         var order = @"
-            | Id | Customers_Id | DateCreated | DateFulfilled  | DatePaid | ProductName | Quantity | QuotedPrice | Notes       |
-            | -- | ------------ | ----------- | -------------- | -------- | ----------- | -------- | ----------- | ----------- |
-            | 23 | 1            | 2021/07/21  | 2021/08/02     | null     | Apples      | 21       | 5.29        | emptyString |";
+        | Id | Customers_Id | DateCreated | DateFulfilled  | DatePaid | ProductName | Quantity | QuotedPrice | Notes       |
+        | -- | ------------ | ----------- | -------------- | -------- | ----------- | -------- | ----------- | ----------- |
+        | 23 | 1            | 2021/07/21  | 2021/08/02     | null     | Apples      | 21       | 5.29        | emptyString |";
 
         Given.UsingThe(_context)
             .TheFollowingSqlStatementIsExecuted("ALTER TABLE Orders DROP CONSTRAINT FK_Orders_Customers;")
@@ -39,8 +39,8 @@ public void test_asserting_using_contains()
 
         Then.UsingThe(_context)
             .TheReaderQueryResultsShouldContain(@"| Id |
-                                                    | -- |
-                                                    | 23 |");
+                                                  | -- |
+                                                  | 23 |");
 
     });
 }
@@ -87,10 +87,99 @@ We are used to defining tabular data in Markdown tables and also Specflow's exam
 
 ### `Given`, `When` and `Then` helper clases
 
-Recently I have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, this gives a nice fluent interface and makes the tests nice a readable.
+Recently I have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, this gives a nice fluent interface and makes the tests nice a readable. You can write whatever C# code you like in the test and you could use the connection directly with `System.Data` like I'm doing here or via Dapper or EF etc this framework is completely un-opinionated.
 
-Here is the code for the 
+The `Given` class contains methods for executing Sql statements (e.g. to remove a foreign key constraint) and methods for inserting test data into a table using a markdown table strings or an instance of a `TabularData`.
+
+The `When` class contains methods for executing Stored Procedures which return a single value, Stored Procedures that return an `IDataReader`, Scalar queries and queries which return an `IDataReader`. The query results are stored on the context so that the `Then` class can neatly access them but there are also overloads which return the query result an Out argument.
+
+The `Then` class has methods for asserting that query results are equal to or contain data specified using a markdown table strings or an instance of a `TabularData` passed in as an qrgument.
+
+Here is the code for the `Given` class showing the use of `System.Data` types to utilise the connection, with some parts removed for brevity
+
+```csharp
+public class Given
+{
+    private readonly ILocalDbTestContext _context;
+    private readonly Action<string>? _logAction;
+
+    public Given(ILocalDbTestContext context, Action<string>? logAction = null)
+    {
+        _context = context;
+        _logAction = logAction;
+    }
+
+    public static Given UsingThe(LocalDbTestContext context, Action<string>? logAction = null) => new(context, logAction);
+
+    public Given And() => this;
+
+    private void LogMessage(string message)
+    {
+        _logAction?.Invoke(message);
+    }
+
+    public Given TheDacpacIsDeployed(string dacpacProjectName = "")
+    {
+        _context.DeployDacpac(dacpacProjectName);
+
+        return this;
+    }
+
+    public Given TheFollowingDataExistsInTheTable(string tableName, string markdownTableString)
+    {
+        var tabularData = TabularData.FromMarkdownTableString(markdownTableString);
+        return TheFollowingDataExistsInTheTable(tableName, tabularData);
+    }
+
+    public Given TheFollowingDataExistsInTheTable(string tableName, TabularData tabularData)
+    {
+        try
+        {
+            var cmd = _context.SqlConnection.CreateCommand();
+            cmd.CommandText = tabularData.ToSqlString(tableName);
+            cmd.CommandType = CommandType.Text;
+            cmd.Transaction = _context.SqlTransaction;
+
+            _context.LastQueryResult = cmd.ExecuteNonQuery();
+
+            LogMessage("TheFollowingDataExistsInTheTable executed successfully");
+
+            return this;
+        }
+        catch (Exception ex)
+        {
+            LogMessage($"Exception thrown while executing TheFollowingDataExistsInTheTable, {ex}");
+            throw;
+        }
+    }
+    // some methods removed for brevity    
+}
+```
 
 ## Performance and efficiency
 
-Starting a temporary localDb and deploying a DacPac are both jobs that take a long time, so its best to do these jobs once for a set of tests, various test frameworks achieve this in different ways, in XUnit its the `IClassFixture`
+Starting a temporary localDb and deploying a DacPac are both quite expensive tasks, so its best to do these jobs once for a set of tests, various test frameworks achieve this in different ways, in XUnit its the `IClassFixture<T>`. A test class that implements this interface will have an instance of `T` injected into it's constructor and the `T` will disposed after any tests have been run.
+
+Here is the class that I am injecting using `IClassFixture` which creates the localDb instance and deploys the dacpac.
+
+```csharp
+public class LocalDbContextFixture : IDisposable
+{
+    public LocalDbTestContext Context;
+
+    public LocalDbContextFixture(IMessageSink sink)
+    {
+        Context = new LocalDbTestContext("SampleDb", log => sink.OnMessage(new DiagnosticMessage(log)));
+        Context.DeployDacpac();
+    }       
+
+    public void Dispose()
+    {
+        Context.TearDown();
+    }
+}
+```
+
+In my experience the localDb takes around 10 seconds to be created and the dacpac takes another 10 seconds, but this is roughly comparable to the setup time that an equivalent T-Sqlt test would take.
+
+So thats it, a lightweight framework which sets up your db instance and then hopefully gets out of the way, letting you test your db objects however you like but providing a nice human readable way to specify tabular data for setups and assertions. Hope you find it useful and thanks for reading!
