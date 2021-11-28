@@ -9,21 +9,23 @@ TL/DR You know you should be testing stored procedures/complex queries etc, if y
 
 ## Background
 
-At work we are currently perfering Dapper to Entity Framework, this means we are writing more stored procedures and naturally want to cover those stored procedures with tests. At first we tried using xUnit tests, which worked perfectly well but the setup and teardown of test data proved a little cumbersome. We then tried switching approach to the TSqlt framework, which again worked perfectly well and had the added advantage of running against a temporary db instance with a DacPac project deployed and running each test in its own Sql transaction. However as developers spoilt by the lovely syntax of modern languages like C#, we found the TSqlt tests quite unpleasant to both read and write!
+At work we are currently preffering Dapper to Entity Framework, this means we are writing more stored procedures and naturally want to cover those stored procedures with tests. At first we tried using xUnit tests, which worked perfectly well but the setup and teardown of test data proved a little cumbersome. We then tried switching approach to the tSQLt framework, which again worked perfectly well and had the added advantage of running against a temporary db instance with a DacPac project deployed and running each test in its own Sql transaction. However as developers spoilt by the lovely syntax of modern languages like C#, we found the tSQLt tests quite unpleasant to both read and write!
 
 I thought that there must be a better way which combined the best bits of both worlds and this Sql test framework is what I came up with. Hopefully it will be useful to other people too.
 
 ## In a nutshell
 
-In a nutshell the framework allows tests to be written in C# using familiar test frameworks (XUnit in the examples), against a temporary instance of localDb, where a DacPac has optionally been deployed, each test given a SqlConnection and a SqlTransaction (which will be rolled back afterwards), with a nice fluent api and an easy way to define tabular data either for test data setup and/or assertions.
+In a nutshell the framework allows tests to be written in C# using familiar test frameworks (XUnit in the examples), against a temporary instance of localDb, where a DacPac has optionally been deployed, each test given a SqlConnection and a SqlTransaction, with a nice fluent api and an easy way to define tabular data for test data setup and/or assertions.
 
 A test looks like this:
 
 ```csharp
 [Fact]
-public void test_asserting_using_contains()
+public void spFetchOrderById_returns_an_order_matching_the_supplied_order_Id()
 {
-    _context.RunTest((connection, transaction) =>
+    new LocalDbTestContext("TestDatabaseName")
+        .DeployDacpac()
+        .RunTest((connection, transaction) =>
     {
         var order = @"
         | Id | Customers_Id | DateCreated | DateFulfilled  | DatePaid | ProductName | Quantity | QuotedPrice | Notes       |
@@ -46,9 +48,20 @@ public void test_asserting_using_contains()
 }
 ```
 
+Hopefully the test is fairly self explanatory :) but this is what's going on:
+
+1. the `LocalDbTestContext` constructor creates a temporary instance of localDb and creates a connection to it. 
+2. the `DeployDacpac` method deploys DacPac containing the database schema we want to test.
+3. `_context.RunTest(...)` this is where we define an Action delagate which is the actual test, making use of the supplied connection and transaction.
+4. `var order = @"` here some setup data is defined using the markdown table syntax, this will be parsed into a `TabularData` object, see the [TabularData](#tabulardata) section below.
+5. `Given...TheFollowingSqlStatementIsExecuted()` here an arbitrary `Sql` command is executed, in this case removing a foreign key constraint so we only have to setup the data we specifically need for the test.
+6. `TheFollowingDataExistsInTheTable()` this method takes the order `TabularData` we just defined and inserts it into the temporary database instance (inside the supplied transaction).
+7. `When...TheStoredProcedureIsExecutedWithReader()` This method executes the named stored procedure that we are tring to test.
+8. `Then...TheReaderQueryResultsShouldContain()` This method asserts that the result returned from the line above contains some data defined in a second tabular data string.
+
 ## Leveraging existing work
 
-The `LocalDbTestContext` class is responsible for setting everything up ready for a set of tests to be executed. For managing the temporary LocalDb instance, I am using the excellent `MartinCostello.SqlLocalDb` package which makes this task relatively trivial and can be found [here on github](https://github.com/martincostello/sqllocaldb) and [here on Nuget](https://www.nuget.org/packages/MartinCostello.SqlLocalDb/)
+The `LocalDbTestContext` class's constructor is responsible for setting everything up ready for a set of tests to be executed. For managing the temporary LocalDb instance, I am using the excellent `MartinCostello.SqlLocalDb` package which makes this task relatively trivial and can be found [here on github](https://github.com/martincostello/sqllocaldb) and [here on Nuget](https://www.nuget.org/packages/MartinCostello.SqlLocalDb/)
 
 For the DacPac deployment I took inspiration from [this StackOverflow thread](https://stackoverflow.com/questions/43365451/improve-the-performance-of-dacpac-deployment-using-c-sharp)
 
@@ -81,9 +94,42 @@ public LocalDbTestContext RunTest(Action<IDbConnection, IDbTransaction> useConne
 
 ## Some nice extra features
 
-### `TabularData` class for human readable data definition
+### TabularData
 
-We are used to defining tabular data in Markdown tables and also Specflow's example tables, data expressed in this format is far easier for a human to 'parse' than Sql statements. So I created a class called `TabularData` which has methods for converting to and form markdown table strings and also converting to Sql statements and from `SqlDataReader`, it also has methods for evaluating whether two `TabularData` are equal and whether one contains another. The code can be found [here](https://github.com/andrewjpoole/CSharpSqlTests/blob/main/CSharpSqlTests/TabularData.cs) The example test above demonstrates its use.
+The `TabularData` class is used for human readable data definition.
+
+We are used to defining tabular data in Markdown tables and also Specflow's example tables, data expressed in this format is far easier for a human to 'parse' than Sql statements. So I created a class called `TabularData` which has methods for converting to and form markdown table strings and also converting to Sql statements and from `SqlDataReader`, it also has methods for evaluating whether two `TabularData` are equal and whether one contains another. The code can be found [here](https://github.com/andrewjpoole/CSharpSqlTests/blob/main/CSharpSqlTests/TabularData.cs). Here is an example of its use:
+
+```csharp
+var testString = @" | id | state     | created    | ref          |
+                    | -- | --------- | ---------- | ------------ |
+                    | 1  | created   | 2021/11/02 | 23hgf4hj3gf4 |
+                    | 2  | pending   | 2021/11/01 | 623kj4hv6hv4 |
+                    | 3  | completed | 2021/10/31 | e0v9736eu476 |"; 
+```
+
+#### String value interpretation
+
+ The following table shows some special cases for how string values are interpretted in `TabularData`:
+
+| string value | interpretted value |
+| -- | -- |
+| emptyString | `""` |
+| null | `null` |
+| true | `True` |
+| false | `False` |
+| 2021/11/02T09:24:17.000 etc | `DateTime.TryParse()` is used, so any valid date string should work |
+
+ The string value will be parsed/matched in the following order: DateTime, Int, Decimal, Float, Double, 'emptyString', 'null', 'true/false', null or finally just taken as a string.
+
+ `TabularData` also has a static builder method in case you want to build one programmatically rather than use the markdown string etc:
+
+ ```csharp
+ var tabularData = TabularData
+        .CreateWithColumns("column1", "column2")
+        .AddRowWithValues("valueA", "valueB")
+        .AddRowWithValues("valueC", "valueD");
+ ```
 
 ### `Given`, `When` and `Then` helper clases
 
@@ -91,14 +137,18 @@ Recently I have started separating out the arrange, act and assert parts of a te
 
 The `Given` class contains methods for executing Sql statements (e.g. to remove a foreign key constraint) and methods for inserting test data into a table using a markdown table strings or an instance of a `TabularData`.
 
-The `When` class contains methods for executing Stored Procedures which return a single value, Stored Procedures that return an `IDataReader`, Scalar queries and queries which return an `IDataReader`. The query results are stored on the context so that the `Then` class can neatly access them but there are also overloads which return the query result an Out argument.
+The `When` class contains methods for executing Stored Procedures and various types of query, the results are stored on the shared instance of the `LocalDbTestContext` so that the `Then` class can neatly access them for assertions, but there are also overloads which return the result an Out argument.
 
-The `Then` class has methods for asserting that query results are equal to or contain data specified using a markdown table strings or an instance of a `TabularData` passed in as an qrgument.
+The `Then` class has methods for asserting that query results are equal to or contain data specified using a markdown table strings or an instance of a `TabularData` passed in as an argument.
 
-Here is the code for the `Given` class showing the use of `System.Data` types to utilise the connection, with some parts removed for brevity
+All three share the instance of the `LocalDbTestContext`, which allows them to access it's `State` dictionary and its `LastQueryResult` object. This object will contain the result of queries made against the connection, for `ExecuteReader()` queries it will contain an `IDataReader`, for `ExecuteNonQuery()` queries it will contain the number of rows affected. When using the `When.TheStoredProcedureIsExecutedWithReturnParameter()` it will contain the actual return parameter from the stored procedure.
+
+These classes are `partial` so you can extend them to add more methods easily.
+
+Here is some of the code for the `Given` class showing the use of `System.Data` types to utilise the connection:
 
 ```csharp
-public class Given
+public partial class Given
 {
     private readonly ILocalDbTestContext _context;
     private readonly Action<string>? _logAction;
@@ -153,6 +203,21 @@ public class Given
         }
     }
     // some methods removed for brevity    
+}
+```
+
+To extend `Given` to add more methods you would do the following:
+
+```csharp
+public partial Given
+{
+    public Given SomeOtherSetupOperationIsPerformed()
+    {
+        // do something here
+        _context.State.Add("newStateObject", 87654) // access the shared _context across the Given, When and Then
+
+        return this; // returning this enables the fluent method chaining.
+    }
 }
 ```
 
