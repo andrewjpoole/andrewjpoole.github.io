@@ -5,17 +5,17 @@ image: /images/csharpsqltests.jpg
 published: false
 ---
 
-TL/DR You know you should be testing stored procedures/complex queries etc, if you're underwhelmed by the T-Sql based frameworks available you might like to use a nice fluent C# framework which makes it easy to run tests against a temporary localDb instance, with a DacPac deployed, in a handy SqlTransaction per test and using markdown table syntax to define data! If so read on...
+TL/DR You know you should be testing stored procedures/complex queries etc, if you're underwhelmed by the T-Sql based frameworks available you might like to use a nice fluent C# framework which makes it easy to run tests against a temporary localDb instance, with a DacPac deployed, in a handy SqlTransaction per test and using markdown table syntax to define data! If so, read on...
 
 ## Background
 
-At work we are currently preffering Dapper to Entity Framework, this means we are writing more stored procedures and naturally want to cover those stored procedures with tests. At first we tried using xUnit tests, which worked perfectly well but the setup and teardown of test data proved a little cumbersome. We then tried switching approach to the tSQLt framework, which again worked perfectly well and had the added advantage of running against a temporary db instance with a DacPac project deployed and running each test in its own Sql transaction. However as developers spoilt by the lovely syntax of modern languages like C#, we found the tSQLt tests quite unpleasant to both read and write!
+At work we are currently preferring Dapper to Entity Framework, this means we are writing more stored procedures and naturally want to cover those stored procedures with tests. At first we tried using xUnit tests, which worked perfectly well but the setup and teardown of test data proved a little cumbersome. We then tried switching approach to the tSQLt framework, which again worked perfectly well and had the added advantage of running against a temporary db instance with a DacPac project deployed and running each test in its own Sql transaction. However, as developers spoilt by the lovely syntax of modern languages like C#, we found the tSQLt tests quite unpleasant to both read and write!
 
 I thought that there must be a better way which combined the best bits of both worlds and this Sql test framework is what I came up with. Hopefully it will be useful to other people too.
 
 ## In a nutshell
 
-In a nutshell the framework allows tests to be written in C# using familiar test frameworks (XUnit in the examples), against a temporary instance of localDb, where a DacPac has optionally been deployed, each test given a SqlConnection and a SqlTransaction, with a nice fluent api and an easy way to define tabular data for test data setup and/or assertions.
+In a nutshell the framework allows tests to be written in C# using familiar test frameworks (xUnit in the examples), against a temporary instance of localDb, where a DacPac has optionally been deployed, each test given a SqlConnection and a SqlTransaction, with a nice fluent API and an easy way to define tabular data for test data setup and/or assertions.
 
 A test looks like this:
 
@@ -52,11 +52,11 @@ Hopefully the test is fairly self explanatory :) but this is what's going on:
 
 1. the `LocalDbTestContext` constructor creates a temporary instance of localDb and creates a connection to it. 
 2. the `DeployDacpac` method deploys DacPac containing the database schema we want to test.
-3. `_context.RunTest(...)` this is where we define an Action delagate which is the actual test, making use of the supplied connection and transaction.
+3. `_context.RunTest(...)` this is where we define an Action delegate which is the actual test, making use of the supplied connection and transaction.
 4. `var order = @"` here some setup data is defined using the markdown table syntax, this will be parsed into a `TabularData` object, see the [TabularData](#tabulardata) section below.
 5. `Given...TheFollowingSqlStatementIsExecuted()` here an arbitrary `Sql` command is executed, in this case removing a foreign key constraint so we only have to setup the data we specifically need for the test.
 6. `TheFollowingDataExistsInTheTable()` this method takes the order `TabularData` we just defined and inserts it into the temporary database instance (inside the supplied transaction).
-7. `When...TheStoredProcedureIsExecutedWithReader()` This method executes the named stored procedure that we are tring to test.
+7. `When...TheStoredProcedureIsExecutedWithReader()` This method executes the named stored procedure that we are trying to test.
 8. `Then...TheReaderQueryResultsShouldContain()` This method asserts that the result returned from the line above contains some data defined in a second tabular data string.
 
 ## Leveraging existing work
@@ -65,11 +65,11 @@ The `LocalDbTestContext` class's constructor is responsible for setting everythi
 
 For the DacPac deployment I took inspiration from [this StackOverflow thread](https://stackoverflow.com/questions/43365451/improve-the-performance-of-dacpac-deployment-using-c-sharp)
 
-## `LocalDbTestContext.RunTest()` method
+## LocalDbTestContext RunTest method
 
-Once the localDb instance is running and we have optionally deployed the Dacpac project, we can use the `RunTest()` method, passing in an `Action<IDbConnection, IDbTransaction>` which is the test to be executed.
+Once the localDb instance is running and we have optionally deployed the DacPac project, we can use the `RunTest()` method, passing in an `Action<IDbConnection, IDbTransaction>` which is the test to be executed.
 
-The action is executed in the context of a new `SqlTransaction` and wrapped in a try finally block, which is used to tidy up any open `DataReader`s and roll back the test's individual `SqlTransaction` this ensures that the tests cannot affect eachother.
+The action is executed in the context of a new `SqlTransaction` and wrapped in a try finally block, which is used to tidy up any open `DataReader`s and roll back the test's individual `SqlTransaction` this ensures that the tests cannot affect each other.
 
 ```csharp
 public LocalDbTestContext RunTest(Action<IDbConnection, IDbTransaction> useConnection)
@@ -98,7 +98,7 @@ public LocalDbTestContext RunTest(Action<IDbConnection, IDbTransaction> useConne
 
 The `TabularData` class is used for human readable data definition.
 
-We are used to defining tabular data in Markdown tables and also Specflow's example tables, data expressed in this format is far easier for a human to 'parse' than Sql statements. So I created a class called `TabularData` which has methods for converting to and form markdown table strings and also converting to Sql statements and from `SqlDataReader`, it also has methods for evaluating whether two `TabularData` are equal and whether one contains another. The code can be found [here](https://github.com/andrewjpoole/CSharpSqlTests/blob/main/CSharpSqlTests/TabularData.cs). Here is an example of its use:
+We are used to defining tabular data in Markdown tables and also using Specflow's example tables, data expressed in this format is far easier for a human to 'parse' than Sql statements. So, I created a class called `TabularData` which has methods for converting to and form markdown table strings and also converting to Sql statements and from `SqlDataReader`, it also has methods for evaluating whether two `TabularData` are equal and whether one contains another. The code can be found [here](https://github.com/andrewjpoole/CSharpSqlTests/blob/main/CSharpSqlTests/TabularData.cs). Here is an example of its use:
 
 ```csharp
 var testString = @" | id | state     | created    | ref          |
@@ -110,9 +110,9 @@ var testString = @" | id | state     | created    | ref          |
 
 #### String value interpretation
 
- The following table shows some special cases for how string values are interpretted in `TabularData`:
+ The following table shows some special cases for how string values are interpreted in `TabularData`:
 
-| string value | interpretted value |
+| string value | interpreted value |
 | -- | -- |
 | emptyString | `""` |
 | null | `null` |
@@ -131,9 +131,9 @@ var testString = @" | id | state     | created    | ref          |
         .AddRowWithValues("valueC", "valueD");
  ```
 
-### `Given`, `When` and `Then` helper clases
+### Given, When and Then helper classes
 
-Recently I have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, this gives a nice fluent interface and makes the tests nice a readable. You can write whatever C# code you like in the test and you could use the connection directly with `System.Data` like I'm doing here or via Dapper or EF etc this framework is completely un-opinionated.
+Recently I have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, this gives a nice fluent interface and makes the tests nice and readable. You can write whatever C# code you like in the test and you could use the connection directly with `System.Data` like I'm doing or via Dapper or EF etc, this framework is completely un-opinionated.
 
 The `Given` class contains methods for executing Sql statements (e.g. to remove a foreign key constraint) and methods for inserting test data into a table using a markdown table strings or an instance of a `TabularData`.
 
@@ -223,9 +223,9 @@ public partial Given
 
 ## Performance and efficiency
 
-Starting a temporary localDb and deploying a DacPac are both quite expensive tasks, so its best to do these jobs once for a set of tests, various test frameworks achieve this in different ways, in XUnit its the `IClassFixture<T>`. A test class that implements this interface will have an instance of `T` injected into it's constructor and the `T` will disposed after any tests have been run.
+Starting a temporary localDb and deploying a DacPac are both quite expensive tasks, so it's best to do these jobs once for a set of tests, various test frameworks achieve this in different ways, in xUnit its the `IClassFixture<T>`. A test class that implements this interface will have an instance of `T` injected into it's constructor and the `T` will disposed after any tests have been run.
 
-Here is the class that I am injecting using `IClassFixture` which creates the localDb instance and deploys the dacpac.
+Here is the class that I am injecting using `IClassFixture` which creates the localDb instance and deploys the DacPac.
 
 ```csharp
 public class LocalDbContextFixture : IDisposable
@@ -245,6 +245,6 @@ public class LocalDbContextFixture : IDisposable
 }
 ```
 
-In my experience the localDb takes around 10 seconds to be created and the dacpac takes another 10 seconds, but this is roughly comparable to the setup time that an equivalent T-Sqlt test would take.
+In my experience the localDb takes around 10 seconds to be created and the DacPac takes another 10 seconds, but this is roughly comparable to the setup time that an equivalent tSQLt test would take.
 
-So thats it, a lightweight framework which sets up your db instance and then hopefully gets out of the way, letting you test your db objects however you like but providing a nice human readable way to specify tabular data for setups and assertions. Hope you find it useful and thanks for reading!
+So that's it, a lightweight framework which sets up your db instance and then hopefully gets out of the way, letting you test your db objects however you like but providing a nice human readable way to specify tabular data for setups and assertions. Hope you find it useful and thanks for reading!
