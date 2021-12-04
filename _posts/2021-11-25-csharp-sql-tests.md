@@ -36,7 +36,7 @@ public void spFetchOrderById_returns_an_order_matching_the_supplied_order_Id()
 
         Given.UsingThe(_context)
             .TheFollowingSqlStatementIsExecuted("ALTER TABLE Orders DROP CONSTRAINT FK_Orders_Customers;") // 5
-            .And().TheFollowingDataExistsInTheTable("Orders", order); // 6
+            .And.TheFollowingDataExistsInTheTable("Orders", order); // 6
 
         When.UsingThe(_context)
             .TheStoredProcedureIsExecutedWithReader("spFetchOrderById", ("OrderId", 23)); // 7
@@ -71,7 +71,7 @@ For the DacPac deployment, I took inspiration from [this StackOverflow thread](h
 
 Once the localDb instance is running and we have optionally deployed the DacPac project, we can use the `RunTest()` method, passing in an `Action<IDbConnection, IDbTransaction>` which is the test to be executed.
 
-The action is executed in the context of a new `SqlTransaction` and wrapped in a `try-finally` block, which is used to tidy up any open `DataReader`s and roll back the test's individual `SqlTransaction` this ensures that the tests cannot affect each other.
+The action is executed in the context of a new `SqlTransaction` and wrapped in a `try finally` block, which is used to tidy up any open `DataReader`s and roll back the test's individual `SqlTransaction` this ensures that the tests cannot affect each other.
 
 ```csharp
 public LocalDbTestContext RunTest(Action<IDbConnection, IDbTransaction> useConnection)
@@ -126,7 +126,7 @@ var testString = @" | id | state     | created    | ref          |
 | false | `False` |
 | 2021/11/02T09:24:17.000 etc | `DateTime.TryParse()` is used, so any valid date string should work |
 
- The string value will be parsed/matched in the following order: DateTime, Int, Decimal, Float, Double, 'emptyString', 'null', 'true/false', null or finally just taken as a string.
+ The string value will be parsed/matched in the following order: DateTime, Int, Decimal, Float, Double, 'emptyString', 'null', 'true', 'false', null or finally just taken as a string.
 
  `TabularData` also has a static builder method in case you want to build one programmatically rather than use the markdown string etc:
 
@@ -167,7 +167,7 @@ public partial class Given
 
     public static Given UsingThe(LocalDbTestContext context, Action<string>? logAction = null) => new(context, logAction);
 
-    public Given And() => this;
+    public Given And => this; // pointless syntactic sugar to make the tests read nicely
 
     private void LogMessage(string message)
     {
