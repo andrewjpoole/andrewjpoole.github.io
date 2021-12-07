@@ -139,7 +139,7 @@ var testString = @" | id | state     | created    | ref          |
 
 ### Given, When and Then helper classes
 
-Recently I have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, this gives a nice fluent interface and makes the tests nice and readable. You can write whatever C# code you like in the test and you could use the connection directly with `System.Data` like I'm doing or via Dapper or EF etc, this framework is completely un-opinionated.
+Recently I have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, this gives a nice fluent interface and makes the tests nice and readable. You can write whatever C# code you like in the test and you could use the connection directly with `System.Data` like I'm doing or via Dapper or EF etc, this framework is un-opinionated.
 
 The `Given` class contains methods for executing Sql statements (e.g. to remove a foreign key constraint) and methods for inserting test data into a table using markdown table strings or an instance of a `TabularData`.
 
@@ -149,34 +149,27 @@ The `Then` class has methods for asserting that query results are equal to or co
 
 All three share the instance of the `LocalDbTestContext`, which allows them to access its `State` dictionary and its `LastQueryResult` object. This object will contain the result of queries made against the connection, for `ExecuteReader()` queries it will contain an `IDataReader`, for `ExecuteNonQuery()` queries it will contain the number of rows affected. When using the `When.TheStoredProcedureIsExecutedWithReturnParameter()` it will contain the actual return parameter from the stored procedure.
 
-These classes are `partial` so you can extend them to add more methods easily.
+The shared `ILocalDbTestContext` in these classes is public so you can extend them using extension methods, there is an example of this below.
 
 Here is some of the code for the `Given` class showing the use of `System.Data` types to utilise the connection:
 
 ```csharp
-public partial class Given
+public class Given
 {
-    private readonly ILocalDbTestContext _context;
-    private readonly Action<string>? _logAction;
+    public ILocalDbTestContext Context;
 
-    public Given(ILocalDbTestContext context, Action<string>? logAction = null)
+    public Given(ILocalDbTestContext context)
     {
-        _context = context;
-        _logAction = logAction;
+        Context = context;
     }
 
-    public static Given UsingThe(LocalDbTestContext context, Action<string>? logAction = null) => new(context, logAction);
+    public static Given UsingThe(LocalDbTestContext context) => new(context, logAction);
 
     public Given And => this; // pointless syntactic sugar to make the tests read nicely
-
-    private void LogMessage(string message)
-    {
-        _logAction?.Invoke(message);
-    }
-
+    
     public Given TheDacpacIsDeployed(string dacpacProjectName = "")
     {
-        _context.DeployDacpac(dacpacProjectName);
+        Context.DeployDacpac(dacpacProjectName);
 
         return this;
     }
@@ -191,12 +184,12 @@ public partial class Given
     {
         try
         {
-            var cmd = _context.SqlConnection.CreateCommand();
+            var cmd = Context.SqlConnection.CreateCommand();
             cmd.CommandText = tabularData.ToSqlString(tableName);
             cmd.CommandType = CommandType.Text;
-            cmd.Transaction = _context.SqlTransaction;
+            cmd.Transaction = Context.SqlTransaction;
 
-            _context.LastQueryResult = cmd.ExecuteNonQuery();
+            Context.LastQueryResult = cmd.ExecuteNonQuery();
 
             LogMessage("TheFollowingDataExistsInTheTable executed successfully");
 
@@ -208,24 +201,24 @@ public partial class Given
             throw;
         }
     }
-    // some methods removed for brevity    
+    // some methods and the triple slash documentation is removed for brevity    
 }
 ```
 
-To extend `Given` to add more methods you would do the following:
+To extend `Given` to add more methods use extension methods:
 
 ```csharp
-public partial Given
+public static class GivenExtensions
 {
-    public Given SomeOtherSetupOperationIsPerformed()
+    public static Given SomeOtherSetupOperationIsPerformed(this Given given)
     {
         // do something here
-        // e.g. access the shared _context 
+        // e.g. access the shared Context 
         // across the Given, When and Then
-        _context.State.Add("newStateObject", 87654) 
+        given.Context.State.Add("newStateObject", 87654) 
 
         // returning this enables the fluent method chaining.
-        return this; 
+        return given; 
     }
 }
 ```
@@ -244,7 +237,7 @@ public class LocalDbContextFixture : IDisposable
     public LocalDbContextFixture(IMessageSink sink)
     {
         Context = new LocalDbTestContext("SampleDb", log => sink.OnMessage(new DiagnosticMessage(log)));
-        Context.DeployDacpac();
+        Context.DeployDacpac(); // If the DacPac name does not match the database name, pass the DacPac name in here, or an absolute path to the file.
     }       
 
     public void Dispose()
