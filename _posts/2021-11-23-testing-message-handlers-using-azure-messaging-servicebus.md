@@ -2,7 +2,7 @@
 layout: post
 title: Testing Service Bus Handlers using Azure.Messaging.ServiceBus client library
 image: /images/bust_tilt_testing.jpg
-published: false
+published: true
 tags:
   - testing
   - service bus
@@ -14,7 +14,7 @@ TL/DR - At ClearBank we love testing and the new `Azure.Messaging.ServiceBus` pa
 
 ## Background
 
-In April 2020 Microsoft brought out a new client library for Azure Service Bus called `Azure.Messaging.ServiceBus`, this new library is based on the open Advanced Message Queuing Protocol (AMQP) standard, from the Microsoft website:
+In April 2020 Microsoft brought out a new client library for Azure Service Bus called `Azure.Messaging.ServiceBus`, this new library is based on the open Advanced Message Queuing Protocol (AMQP) standard. Microsoft outlines:
 >[AMQP enables you to build cross-platform, hybrid applications using a vendor-neutral and implementation-neutral, open standard protocol. You can construct applications using components that are built using different languages and frameworks, and that run on different operating systems. All these components can connect to Service Bus and seamlessly exchange structured business messages efficiently and at full fidelity.](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-amqp-overview)
 
 The class library documentation hints at this library being testable! This is great because one of the frustrations of using previous Service Bus client libraries was that absolutely everything was sealed or protected, meaning the only way to test client code was to wrap up and abstract away the service bus infrastructure. The situation might have been helped by a local emulator, but despite being a highly requested and up-voted feature request, an emulator was never officially implemented. So any improvements to the testability of Service Bus client code would be very welcome indeed!
@@ -25,7 +25,7 @@ There are no official samples yet and very few (if any) blog posts covering how 
 
 ## Component tests
 
-At ClearBank we are favouring 'component tests' over reams of unit tests, I'm not sure who coined the name 'component test', but I see them as a kind of internal integration test. So we run some kind of test host, using real concrete objects, with the exception of anything which touches the network, these objects are mocked. We test as much of the service as possible i.e. including the `Startup` class and the `Program` class if possible. The tests include happy and sad paths, enough to give sufficiently high line and branch coverage of the tested services. These kind of tests take longer to setup than pure unit tests making TDD a bit harder to start with, but they run locally, they run much faster and are less brittle than integration/end-to-end tests, giving the same confidence that the business logic is proven in a smaller number of tests than traditional unit tests. Of course you still need a couple of integration tests but these need only prove that the integration is working, rather than all of the paths through the logic.
+At ClearBank we are favouring 'component tests' over reams of unit tests, I'm not sure who coined the name 'component test', but I see them as a kind of internal integration test. So we run some kind of test host, using real concrete objects, with the exception of anything which touches the network, these objects are mocked. We test as much of the service as possible i.e. including the `Startup` class and the `Program` class if possible. The tests include happy and sad paths, enough to give sufficiently high line and branch coverage of the tested services. These kind of tests take longer to setup than pure unit tests making Test Driven Development (TDD) a bit harder to start with, but they run locally, they run much faster and are less brittle than integration/end-to-end tests, giving the same confidence that the business logic is proven in a smaller number of tests than traditional unit tests. Of course, you still need a couple of integration tests but these need only prove that the integration is working, rather than all of the paths through the logic.
 
 ## Testing message handlers
 
@@ -342,3 +342,5 @@ And that is how we are testing message handling code which uses the `Azure.Messa
 All of the code from this post can be found [here](https://github.com/andrewjpoole/azure-messaging-servicebus-handler-tests)
 
 The title image is from [here](https://rarehistoricalphotos.com/double-decker-buses-tilt-testing-1933/)
+
+This blog was first published on the [ClearBank tech blog](https://www.clear.bank/newsroom/testing-azure-service-bus-handlers)
