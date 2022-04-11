@@ -258,6 +258,6 @@ If you would also like to measure code coverage of your SQL code, there is a gre
 All of the source code can be found on GitHub [here](https://github.com/andrewjpoole/CSharpSqlTests)
 Contributions are very welcome.
 
-Packages are available on Nuget, the main [CSharpSqlTests package here](https://www.nuget.org/packages/CSharpSqlTests/), additional [Xunit extensions package here](https://www.nuget.org/packages/CSharpSqlTests.Xunit/) and additional [NUnit extensions package here](https://www.nuget.org/packages/CSharpSqlTests.NUnit/)
-
 So that's it, a lightweight framework that sets up your db instance and then hopefully gets out of the way, letting you test your db objects however you like but also providing a few helpful classes for common tasks. Hope you find it useful and thanks for reading!
+
+Packages are available on Nuget, the main [CSharpSqlTests package here](https://www.nuget.org/packages/CSharpSqlTests/), additional [Xunit extensions package here](https://www.nuget.org/packages/CSharpSqlTests.Xunit/) and additional [NUnit extensions package here](https://www.nuget.org/packages/CSharpSqlTests.NUnit/)
