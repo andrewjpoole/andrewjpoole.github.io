@@ -15,7 +15,7 @@ I thought there must be a better way to combine the best bits of both worlds and
 
 ## In a nutshell
 
-The framework allows tests to be written in C# using familiar test frameworks (xUnit is used in the examples). The tests can be run against localDb or some SQL server. There is a method that optionally deploys a DacPac. Each test is given a SqlConnection and its own SqlTransaction which isolates it from any other tests. The framework also includes some helper classes and an easy way to define tabular data for test data setup and/or assertions.
+The framework allows tests to be written in C# using familiar test frameworks (xUnit is used in the examples). The tests can be run against localDb or some other SQL server. A DacPac can optionally be deployed. Each test is isolated from the other tests. Given, When and Then helper classes are included to and also a way to define tabular data for test data setup and/or assertions. More on those things later.
 
 A test looks like this:
 
@@ -44,9 +44,9 @@ public void spFetchOrderById_returns_an_order_matching_the_supplied_order_Id()
                 ("OrderId", 23)); // 7
 
         Then.UsingThe(_context)
-            .TheReaderQueryResultsShouldContain(@"| Id |
-                                                  | -- |
-                                                  | 23 |"); // 8
+            .TheReaderQueryResultsShouldContain(@"| Id | Product |
+                                                  | -- | ------- |
+                                                  | 23 | Apples  |"); // 8
 
     });
 }
@@ -74,7 +74,7 @@ For the DacPac deployment, I took inspiration from [this StackOverflow thread](h
 
 The `RunTest()` method unsuprisingly runs a test defined in the  `Action<IDbConnection, IDbTransaction>` passed into the method.
 
-A new connection is opened and a new `SqlTransaction` created which are passed to the Action. The Action is called within a `try finally` block, which is then used to tidy up any open `DataReader` objects on the connection and roll back the `SqlTransaction` after the test Action has been invoked, this ensures that each test starts with a clean slateunaffected by other tests.
+A new connection is opened and a new `SqlTransaction` created which are passed to the Action. The Action is called within a `try finally` block, which is then used to tidy up any open `DataReader` objects on the connection and roll back the `SqlTransaction` after the test Action has been invoked, this ensures that each test starts with a clean slate unaffected by other tests.
 
 ## Some nice extra features
 
@@ -114,6 +114,8 @@ The markdown table string methods work best for tables with a small number of co
         .AddRowWithValues("valueA", "valueB")
         .AddRowWithValues("valueC", "valueD");
  ```
+
+One thing to note, the `TabularData` class doesn't know the schema of the database table it describes. So if you will be using one to populate a table, the column names and rows data types that you populate it with need to match the table schema otherwise a `SqlException` will be thrown when attempting to insert the data.
 
 ### Given, When and Then helper classes
 
@@ -215,7 +217,7 @@ public class LocalDbContextFixture : IDisposable
     public LocalDbContextFixture(IMessageSink sink)
     {
         Context = new LocalDbTestContext("SampleDb", log => sink.OnMessage(new DiagnosticMessage(log)));
-        Context.DeployDacpac(); // If the DacPac name does not match the database name, pass the DacPac name in here, or an absolute path to the file.
+        Context.DeployDacpac(); // If the DacPac name != database name, pass the DacPac name in here, or even better an absolute path to the file.
     }       
 
     public void Dispose()
@@ -231,9 +233,9 @@ In my simple test scenario, the localDb takes around 10 seconds to spin up and t
 
 The framework has the following modes:
 
-| Name | Explanation | Usecase |
+| Name | Explanation | Use-case |
 | -- | -- | -- |
-| `TemporaryLocalDbInstance ` | The framework spins up a temporary localDb instance and tears it down again afterwards | Great for local development |
+| `TemporaryLocalDbInstance` | The framework spins up a temporary localDb instance and tears it down again afterwards | Great for local development |
 | `ExistingLocalDbInstanceViaInstanceName` | The framework will locate and use a named pre-existing localDb instance | Can be useful in some CI scenarios, especially where the context is monitored e.g. by SqlCover |
 | `ExistingDatabaseViaConnectionString` | The framework will connect to a SQL Server instance using the supplied connection string | Can be useful in some CI scenarios, especially where the context is monitored e.g. by SqlCover or where SQL is hosted in a container |
 
@@ -244,6 +246,8 @@ The mode is set in the constructor of the `DbTestContext` but it can also be ove
 | "CSharpSqlTests_Mode" | Set the mode |
 | "CSharpSqlTests_ConnectionString" | Specify a connection string to a SQL Server instance |
 | "CSharpSqlTests_ExistingLocalDbInstanceName" | Specify the name of an existing LocalDB instance to use |
+
+This means your code can use `TemporaryLocalDbInstance` by default for local dev but your CI build can switch to a different mode using environment variables.
 
 ### SQLCover
 
