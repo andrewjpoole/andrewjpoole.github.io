@@ -2,7 +2,7 @@
 layout: post
 title: Given, When and Then helper classes for testing
 image: /images/gherkin.jpg
-published: false
+published: true
 ---
 
 # Given, When and Then helper classes for testing
