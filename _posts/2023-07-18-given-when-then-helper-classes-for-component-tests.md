@@ -1,3 +1,10 @@
+---
+layout: post
+title: Given, When and Then helper classes for testing
+image: /images/gherkin.jpg
+published: false
+---
+
 # Given, When and Then helper classes for testing
 
 ## TL/DR
