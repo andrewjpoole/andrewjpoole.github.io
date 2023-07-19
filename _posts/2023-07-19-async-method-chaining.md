@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Async method chaining in C#
-image: /images/chain-shiny.jpg
+image: /images/chain-shiny-portrait.jpg
 published: true
 ---
 
