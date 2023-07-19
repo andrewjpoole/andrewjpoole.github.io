@@ -36,7 +36,9 @@ Also because we may be interacting with external dependencies, the Handle method
 
 Initially, we considered using MediatR to refactor our logic, but it seemed overkill and looking through another repo where we were already using MediatR, it seemed quite hard to navigate. Each Request/Command Handler had to map its result into a new (but almost identical) Command/Request object with another Handler. So to figure out the path through the code, a fair amount of searching was nessecary.  
 
-A long while ago I did some work with Windows Workflow Foundation, which I really enjoyed. Code would be organised into functional chunks called Activities, each having In arguments, Out arguments and sometimes InOut arguments. The Activities would be arranged in a visual workflow, so the flow and ordering was really obvious. The striking thing about it, was that new team members could instantly find their way around and once inside an Activity it was immediately obvious what the scope of the task was, what inputs were available to use and what outputs would need to be set. I wanted to find a way to replicate this declarative flow and a flavour of the functional isolation, because I want engineers to easily see whats going on and find their way around. Our final solution shows the flow declaratively in once place and `[ctrl]+[f12]` takes you straight to the code in Visual Studio!
+A long while ago I did some work with Windows Workflow Foundation, which I really enjoyed. Code would be organised into functional chunks called Activities, each having In arguments, Out arguments and sometimes InOut arguments. The Activities would be arranged in a visual workflow, so the flow and ordering was really obvious. The striking thing about it, was that new team members could instantly find their way around and once inside an Activity it was immediately obvious what the scope of the task was, what inputs were available to use and what outputs would need to be set. 
+
+I wanted to find a way to replicate this declarative flow and a flavour of the functional isolation, because I want engineers to easily see whats going on and find their way around. Our final solution shows the flow declaratively in once place and `[ctrl]+[f12]` takes you straight to the code in Visual Studio!
 
 ## How its used
 
@@ -74,7 +76,9 @@ public class GetWeatherReportRequestHandler : IGetWeatherReportRequestHandler
 ```
 A static method named `Create()` returns an initialised `WeatherReport` object, but it actually returns a `Task<oneOf<WeatherReport, Failure>>` we'll see why in a moment. This object contains any required state and crucially represents Success when returned.
 
-To be chained, a method need only have the correct signature, it must accept a `WeatherReport` as its only argument and return a `Task<OneOf<WeatherReport, Failure>>`. The method may read state from the `WeatherReport`, perform its task, it may set some resulting state on the `WeatherReport` object and then it should return the `WeatherReport` object if sucessfull _or_ a derrivative of `Failure` if not. Note the methods can live anywhere, they might be local or live on services injected from IoC, they just need the correct signature.
+To be chained, a method need only have the correct signature, it must accept a `WeatherReport` as its only argument and return a `Task<OneOf<WeatherReport, Failure>>`. The method may read state from the `WeatherReport`, perform its task, it may set some resulting state on the `WeatherReport` object and then it should return the `WeatherReport` object if sucessfull _or_ a derrivative of `Failure` if not. 
+
+Note the methods can live anywhere, they might be local or live on services injected from IoC, they just need the correct signature.
 
 The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<oneOf<T, TFailure>>` in the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<oneOf<WeatherReport, Failure>>`
 
