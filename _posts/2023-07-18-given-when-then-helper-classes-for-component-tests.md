@@ -38,6 +38,8 @@ Hopefully you agree that while still outlining exactly what is being setup, exec
 
 ## Background
 
+I have mentioned this pattern in other blog posts, but I've been using it for a while now on many different projects and it continues to be extrememly useful so I thought it deserved a blog in its own right.
+
 In our team we favour using Component tests to create the majority of our code coverage, filling in with Unit tests where necessary. Then we add minimal Integration tests to prove out integrations with external services and finally end-to-end tests to test flows from start to finish. I guess this roughly aligns to the testing trophy idea as opposed to the testing triangle.
 
 Our Component tests are like internal Integration tests, we we aim to exercise as much of the app as possible, just mocking the external dependencies at the outermost point. So for example, we use WebApplicationFactory<TEntryPoint> to test from the Program onwards, setting up Mocks and switching them in place of external service interfaces, such as database or service bus connections. The rest of the real services/components under test obviously do not know that the external dependencies are mocked. 
