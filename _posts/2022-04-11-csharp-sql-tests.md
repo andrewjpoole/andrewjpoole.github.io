@@ -2,7 +2,7 @@
 layout: post
 title: CSharp SQL Tests
 image: /images/csharpsqltests.jpg
-published: false
+published: true
 ---
 
 TL/DR You know you should be testing T-SQL code in stored procedures/views and if you're underwhelmed by the T-Sql based frameworks available you might like to use a nice fluent C# framework and even use markdown table syntax to define data! If so, read on...
@@ -15,7 +15,7 @@ I thought there must be a better way to combine the best bits of both worlds and
 
 ## In a nutshell
 
-The framework allows tests to be written in C# using familiar test frameworks (xUnit is used in the examples). The tests can be run against localDb or some other SQL server. A DacPac can optionally be deployed. Each test is isolated from the other tests. Given, When and Then helper classes are included to and also a way to define tabular data for test data setup and/or assertions. More on those things later.
+The framework allows tests to be written in C# using familiar test frameworks (xUnit is used in the examples). The tests can be run against localDb or some other SQL server. A DacPac can optionally be deployed. Each test is isolated from the other tests. Given, When and Then helper classes are included to and also a way to define tabular data for test data setup and/or assertions. More on those things later. We are also using this package to test repository classes in addition to stored procedures.
 
 A test looks like this:
 
@@ -70,11 +70,13 @@ The `LocalDbTestContext` class's constructor is responsible for setting everythi
 
 For the DacPac deployment, I took inspiration from [this StackOverflow thread](https://stackoverflow.com/questions/43365451/improve-the-performance-of-dacpac-deployment-using-c-sharp). The framework contains a class named `DacPacInfo` which is passed a string either containing a path to a dacpac file or a dacpac file name. If passed a path it will just use that path, otherwise it will traverse up the solution directory structure to a configurable number of levels and then use the file name to search for matching dacpac files and use the first onenit finds, this second method obviously takes longer.
 
-## LocalDbTestContext RunTest method
+## DbTestContext RunTest method
 
 The `RunTest()` method unsuprisingly runs a test defined in the  `Action<IDbConnection, IDbTransaction>` passed into the method.
 
 A new connection is opened and a new `SqlTransaction` created which are passed to the Action. The Action is called within a `try finally` block, which is then used to tidy up any open `DataReader` objects on the connection and roll back the `SqlTransaction` after the test Action has been invoked, this ensures that each test starts with a clean slate unaffected by other tests.
+
+There is also an overload of the `RunTest()` method which not begin and roll back a transaction, this is useful for testing repository classes which usually like to creat a new connection, use it and dispose it soon afterwards. Please not you will have to manage and tidying up of test data to ensure tests do not interfere with each other as theres no transaction to be rolled back for you.
 
 ## Some nice extra features
 
@@ -82,14 +84,21 @@ A new connection is opened and a new `SqlTransaction` created which are passed t
 
 The `TabularData` class can be used for human-readable data definition.
 
-We are used to defining tabular data in Markdown tables and also using Specflow's example tables, data expressed in this format is far easier for a human to 'parse' than SQL statements. So, I created a class called `TabularData` which has methods for converting to and from markdown table strings and also converting to SQL statements, and from `SqlDataReader`, it also has methods for evaluating whether two `TabularData` are equal and whether one contains another. The code can be found [here](https://github.com/andrewjpoole/CSharpSqlTests/blob/main/CSharpSqlTests/TabularData.cs). Here is an example of its use:
+We are used to defining tabular data in Markdown tables and also using Specflow's example tables, data expressed in this format is far easier for a human to 'parse' than SQL statements. So, I created a class called `TabularData` which has methods for converting to and from markdown table strings and also converting to SQL statements, and from `SqlDataReader`, it also has methods for evaluating whether two `TabularData` are equal and whether one contains another. The code can be found [here](https://github.com/andrewjpoole/CSharpSqlTests/blob/main/CSharpSqlTests/TabularData.cs). Here are some examples of its use:
 
 ```csharp
+// Using markdown/specflow table style strings
 var testString = @" | id | state     | created    | ref          |
                     | -- | --------- | ---------- | ------------ |
                     | 1  | created   | 2021/11/02 | 23hgf4hj3gf4 |
                     | 2  | pending   | 2021/11/01 | 623kj4hv6hv4 |
-                    | 3  | completed | 2021/10/31 | e0v9736eu476 |"; 
+                    | 3  | completed | 2021/10/31 | e0v9736eu476 |";
+
+// Using static builder methods (handy if the table has lots of columns)
+var tabularData = TabularData
+        .CreateWithColumns("column1", "column2")
+        .AddRowWithValues("valueA", "valueB")
+        .AddRowWithValues("valueC", "valueD");
 ```
 
 #### String value interpretation
@@ -105,15 +114,6 @@ var testString = @" | id | state     | created    | ref          |
 | true        | a boolean true |
 | false       | a boolean false |
 | "2"         | a string |
-
-The markdown table string methods work best for tables with a small number of columns, but for larger tables `TabularData` also has a static builder method in case you want to build one programmatically rather than use the markdown string etc:
-
- ```csharp
- var tabularData = TabularData
-        .CreateWithColumns("column1", "column2")
-        .AddRowWithValues("valueA", "valueB")
-        .AddRowWithValues("valueC", "valueD");
- ```
 
 One thing to note, the `TabularData` class doesn't know the schema of the database table it describes. So if you will be using one to populate a table, the column names and rows data types that you populate it with need to match the table schema otherwise a `SqlException` will be thrown when attempting to insert the data.
 
@@ -258,6 +258,6 @@ If you would also like to measure code coverage of your SQL code, there is a gre
 All of the source code can be found on GitHub [here](https://github.com/andrewjpoole/CSharpSqlTests)
 Contributions are very welcome.
 
-So that's it, a lightweight framework that sets up your db instance and then hopefully gets out of the way, letting you test your db objects however you like but also providing a few helpful classes for common tasks. Hope you find it useful and thanks for reading!
+So that's it, a lightweight framework that sets up your db instance and then hopefully gets out of the way, letting you test your db objects and repository classes however you like but also providing a few helpful classes for common tasks. Hope you find it useful and thanks for reading!
 
 Packages are available on Nuget, the main [CSharpSqlTests package here](https://www.nuget.org/packages/CSharpSqlTests/), additional [Xunit extensions package here](https://www.nuget.org/packages/CSharpSqlTests.Xunit/) and additional [NUnit extensions package here](https://www.nuget.org/packages/CSharpSqlTests.NUnit/)
