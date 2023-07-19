@@ -2,7 +2,7 @@
 layout: post
 title: Async method chaining in C#
 image: /images/chain-shiny.jpg
-published: false
+published: true
 ---
 
 # Async Method Chaining in C#
