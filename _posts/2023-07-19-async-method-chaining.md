@@ -138,6 +138,6 @@ return await PaymentDetails.Create(request)
 
 So if you also have multiple tasks to perform off the back of an API request or when handling a Service Bus message etc, maybe consider this method of chaining methods together. Maintain a single return path, place the methods wherever they best fit and make life easy for your team by expressing declaratively the flow of tasks with super-easy code navigation. 
 
-This code is avilable in a Nuget package and in this GitHib repository, but its basically 3 extension methods, so copy/paste away!
+This code is avilable in a [Nuget package]() and in this [GitHib repository](https://github.com/andrewjpoole/OneOf.Chaining), but its basically 3 extension methods, so copy/paste away!
 
 Hope you found this interesting, thanks for reading :)
