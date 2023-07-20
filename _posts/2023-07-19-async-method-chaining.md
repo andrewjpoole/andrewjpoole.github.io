@@ -80,7 +80,7 @@ To be chained, a method need only have the correct signature, it must accept a `
 
 Note the methods can live anywhere, they might be local or live on services injected from IoC, they just need the correct signature.
 
-The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<oneOf<T, TFailure>>` in the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<oneOf<WeatherReport, Failure>>`
+The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<oneOf<T, TFailure>>` in the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<oneOf<WeatherReport, Failure>>`. The compiler infers what the `T` and `TFailure` are from the first method in the chain.
 
 ## How it works
 
