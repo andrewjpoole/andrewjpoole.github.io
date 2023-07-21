@@ -50,7 +50,7 @@ There are downsides to this approach; there is a fair amount of code to initiall
 
 ## Given, When and Then classes
 
-In order to solve some of those problems, we have started separating out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, every method on each of these classes returns itself, which results in a nice fluent interface making the tests shorter and improving readability. This approach encourages code sharing and consistency across tests.
+In order to solve some of those problems, we separate out the arrange, act and assert parts of a test into `Given`, `When` and `Then` classes, every method on each of these classes returns itself, which results in a nice fluent interface making the tests shorter and improving readability. This approach encourages code sharing and consistency across tests.
 
 ### The `Given` class 
 
@@ -62,13 +62,13 @@ is responsible for the 'act' part of the test and typically contains methods for
 
 ### The `Then` class 
 
-is responsible for the 'assert' part of the test and contains methods for making assertions. One useful trick is to have a method which takes an Action to allow the tests to do their own assertions, for example you might have a method named `TheHttpResponseContainsABody(HttpResponseMessage response, Action<string> assertAgainstBody)` this can then be used like this: `And.TheHttpResponseContainsABody(response, body => body.Should().Be("Alive!"))`
+is responsible for the 'assert' part of the test and contains methods for making assertions. One useful trick is to have a method which takes an Action to allow the tests to do their own assertions with any assertion library, for example you might have a method named `TheHttpResponseContainsABody(HttpResponseMessage response, Action<string> assertAgainstBody)` this can then be used with  FluentAssertions like this: `And.TheHttpResponseContainsABody(response, body => body.Should().Be("Alive!"))`
 
-In the above example, the whole `Then` section is wrapped in a `using (new AssertionScope())` this means that also assertions will be evaluated before any failed assertions cause the test to fail, so all of the failed assertions will be reported, rather than just the first one.
+In the above example, the whole `Then` section is wrapped in a `using (new AssertionScope())` this means that all assertions will be evaluated before any failed assertions cause the test to fail, so all of the failed assertions will be reported, rather than just the first one.
 
 ### Shared stuff
 
-All three classes share an instance of whatever owns the Mocks and useful properties or fields, lets call this the context. Each class has a static method `UsingThe()` which assigns this shared state object and returns a new `Given`, `When` or `Then`. Each class also has a dummy `And` property which just returns itself meaning the tests read more like english sentances.
+All three classes share an instance of whatever owns the Mocks and useful properties or fields, lets call this the context. Each class has a static method `UsingThe()` which assigns this shared state object and returns a new `Given`, `When` or `Then`. Each class also has a dummy `And` property which just returns itself meaning the tests read more like English sentances.
 
 ### Out variables!
 
@@ -76,7 +76,7 @@ So no-one likes out variables, myself included, but here they offer a way of def
 
 ### Some code
 
-Rather than pointing at a Github repo, simplified example `Given`, `When` and `Then` classes are included below to get you going.
+Simplified example `Given`, `When` and `Then` classes are included below to get you going. These classes are necessarily specific to the app under test, so we find we start from scratch each time, here is [a handly gist](https://gist.github.com/andrewjpoole/039ae07be0bc3534cda6383780d5a945) containing the bare bones classes ready to add methods to.
 
 Here is an example of a Given class with methods for setting up testing an API:
 ```csharp
@@ -152,7 +152,7 @@ public class When
 
 #### Async methods
 
-The methods on these classes are nessecarily all ordinary synchronous methods, otherwise the await keyword would prevent the method chaining. So to execute some asynchronous process like calling an API we do use `.GetAwaiter().GetResult();` The reason I'm Ok with this is that the test code being synchronous actually simplifies things. If the test code and the code-under-test were both async, I think there would be more chance of race conditions and more complex code to prevent them. This way, if we need to wait for an async process to complete, e.g. for a service bus handler to finish handling a message, we can add a method `Then... And.WeWaitSomeTimeForProcessingToComplete(timeToWaitInMilliSeconds: 500)`
+The methods on these classes are necessarily all ordinary synchronous methods, otherwise the await keyword would prevent the method chaining. So to execute some asynchronous process like calling an API we do use `.GetAwaiter().GetResult();` The reason I'm Ok with this is that the test code being synchronous actually simplifies things. If the test code and the code-under-test were both async, I think there would be more chance of race conditions and more complex code to prevent them. This way, if we need to wait for an async process to complete, e.g. for a service bus handler to finish handling a message, we can add a method `Then... And.WeWaitSomeTimeForProcessingToComplete(timeToWaitInMilliSeconds: 500)`
 
 
 Here is an example of a Then class with methods for testing an API:
