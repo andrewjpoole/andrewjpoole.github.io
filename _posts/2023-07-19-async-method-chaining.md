@@ -9,18 +9,18 @@ published: true
 
 ## TL/DR
 
-We recently had a large amount of fairly procedural logic performing multiple tasks in an API request handler, we wanted a way to split it up, but maintaining a really obvious flow and ease of code navigation. This is what we came up with:
+We recently had a large amount of fairly procedural logic performing multiple tasks in an API request handler, we wanted a way to split it up, but maintaining a really obvious flow and ease of code navigation. This is what we came up with applied to a contrived WeatherReport API:
 ```csharp
 public async Task<OneOf<WeatherReport, Failure>> Handle(string requestedRegion, DateTime requestedDate)
 {
     return await WeatherReport.Create(requestedRegion, requestedDate)
-        .Then(wr => regionValidator.ValidateRegion(wr))
-        .Then(wr => dateChecker.CheckDate(wr))
-        .Then(wr => CheckCache(wr))
-        .Then(wr => weatherForecastGenerator.Generate(wr));
+        .Then(regionValidator.ValidateRegion)
+        .Then(dateChecker.CheckDate)
+        .Then(CheckCache)
+        .Then(weatherForecastGenerator.Generate);
 }
 ```
-This code is wired-up directly a minimal API, where the `OneOf<WeatherReport, Failure>` result is converted to an HttpResponse and returned. If you like the look of that, read on!
+This code is wired-up directly a minimal API, where the `OneOf<WeatherReport, Failure>` result is converted to an HttpResponse and returned. These are async methods, chained together with a single return path. If you like the look of that, read on!
 
 ## Background
 
@@ -74,19 +74,40 @@ public class GetWeatherReportRequestHandler : IGetWeatherReportRequestHandler
     }
 }
 ```
-A static method named `Create()` returns an initialised `WeatherReport` object, but it actually returns a `Task<oneOf<WeatherReport, Failure>>` we'll see why in a moment. This object contains any required state and crucially represents Success when returned.
+A static method named `Create()` returns an initialised `WeatherReport` object, but it actually returns a `Task<oneOf<WeatherReport, Failure>>` we'll see why in a moment. The `WeatherReport` object contains any required state and crucially represents Success when returned.
 
-To be chained, a method need only have the correct signature, it must accept a `WeatherReport` as its only argument and return a `Task<OneOf<WeatherReport, Failure>>`. The method may read state from the `WeatherReport`, perform its task, it may set some resulting state on the `WeatherReport` object and then it should return the `WeatherReport` object if sucessfull _or_ a derrivative of `Failure` if not. 
+To be chained, a method need only have the correct return type, in this case a `Task<OneOf<WeatherReport, Failure>>`. The chained method will probably recieve a `WeatherReport` as an argument so it can read some state, perform its task, possibly set some resulting state and then crucially it should return the `WeatherReport` object if sucessful _or_ a derrivative of `Failure` if not. 
 
 Note the methods can live anywhere, they might be local or live on services injected from IoC, they just need the correct signature.
 
-The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<oneOf<T, TFailure>>` in the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<oneOf<WeatherReport, Failure>>`. The compiler infers what the `T` and `TFailure` are from the first method in the chain.
+The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<oneOf<T, TFailure>>` in the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<oneOf<WeatherReport, Failure>>`. The compiler infers what the Types `T` and `TFailure` are from the first method in the chain.
+
+In this version you can see the `WeatherReport` variable named `report` being explicitly passed into each chained method, if the chained methods only have a single `T` argument then you can use the C# feature method group conversion to delegate, making the code even more terse and easily readable: 
+```csharp
+.Then(report => regionValidator.ValidateRegion(report))
+// becomes
+.Then(regionValidator.ValidateRegion)
+```
+This is shown in the TLDR section at the top.
+
+As with any lambda expressions in C#, the func containing the chained method can capture any outer variables in scope e.g. 
+```csharp
+var validationSettings = new ValidationSettings{...}
+...
+.Then(report => regionValidator.ValidateRegion(report, validationSettings))
+```
+
+Out variables can also be used to return state from a chained method and passed into subsequent chained methods or consumed in the method containing the chain.
+
+We have had success using a record for the `T` where some properties are set initially in our `Create()` method and other nullable properties start life as null, but are later set while creating a new version of the record using the `with` keyword.
 
 ## How it works
 
-Here is the extension method `Then`:
+Here is the simplest version of the extension method `Then`:
 ```csharp
-public static async Task<OneOf<T, TFailure>> Then<T, TFailure>(this Task<OneOf<T, TFailure>> currentJobResult, Func<T, Task<OneOf<T, TFailure>>> nextJob)
+public static async Task<OneOf<T, TFailure>> Then<T, TFailure>(
+  this Task<OneOf<T, TFailure>> currentJobResult,
+  Func<T, Task<OneOf<T, TFailure>>> nextJob)
 {
     // Inspect result of (probably already awaited) currentJobResult, if its a TFailure return it...
     var TOrFailure = await currentJobResult;
@@ -110,22 +131,27 @@ We had a case where we were creating two transactions, one after the other in th
 
 Here is the overload of the extension method `Then` with `onFailure`:
 ```csharp
-public static async Task<OneOf<T, TFailure>> Then<T, TFailure>(this Task<OneOf<T, TFailure>> currentJobResult, Func<T, Task<OneOf<T, TFailure>>> nextJob, Func<T, Task> onFailure)
+public static async Task<OneOf<T, TFailure>> Then<T, TFailure>(
+  this Task<OneOf<T, TFailure>> currentJobResult,
+  Func<T, Task<OneOf<T, TFailure>>> nextJob,
+  Func<T, TFailure, Task<TFailure>> onFailure)
 {
     // Inspect result of (probably already awaited) currentJobResult, if its a TFailure return it...
-    var TOrFailure = await currentJobResult;
-    if (TOrFailure.IsT1)
-        return TOrFailure;
+        var TOrFailure = await currentJobResult;
+        if (TOrFailure.IsT1)
+            return TOrFailure;
 
-    // ...Otherwise do your next job ... 
-    var currentT = TOrFailure.AsT0;
-    var result = await nextJob(currentT);
+        // ...Otherwise do your next job ... 
+        var currentT = TOrFailure.AsT0;
+        var result = await nextJob(currentT);
 
-    if (result.IsT0)
-        return result;
-
-    await onFailure(currentT);
-    return result;
+        // If next job returned a T (Success) return it...
+        if (result.IsT0)
+            return result;        
+        
+        // Otherwise invoke onFailure and return the final resulting TFailure...
+        var finalFailure = await onFailure(currentT, result.AsT1);
+        return finalFailure;
 }
 ```
 It can be used like this:
@@ -134,14 +160,16 @@ return await PaymentDetails.Create(request)
         .Then(d => validator.ValidateRequest(d))
         .Then(d => paymentRepository.Save(d))
         .Then(d => transactionService.CreateDebitTransaction(d))
-        .Then(d => transactionService.CreateCreditTransaction(d), onFailure: d => transactionService.CancelDebitTransaction(d))
+        .Then(d => transactionService.CreateCreditTransaction(d), onFailure: d, f => transactionService.CancelDebitTransaction(d, f))
         .Then(d => eventDispatcher.Dispatch(d));
 ```
+
+We also have a method named `IfThen()` which takes an additional `func<T, bool>` named `condition` so that the `nextJob` will only be invoked if `condition` evaluates to True; I'm sure there are other variations which will be added. 
 
 ## Conclusion
 
 So if you also have multiple tasks to perform off the back of an API request or when handling a Service Bus message etc, maybe consider this method of chaining methods together. Maintain a single return path, place the methods wherever they best fit and make life easy for your team by expressing declaratively the flow of tasks with super-easy code navigation. 
 
-This code is avilable in a [Nuget package]() and in this [GitHib repository](https://github.com/andrewjpoole/OneOf.Chaining), but its basically 3 extension methods, so copy/paste away!
+This code is avilable in a [Nuget package]() and in this [GitHib repository](https://github.com/andrewjpoole/OneOf.Chaining), but its basically a few small extension methods, so copy/paste away!
 
 Hope you found this interesting, thanks for reading :)
