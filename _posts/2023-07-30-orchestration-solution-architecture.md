@@ -63,6 +63,49 @@ diagram here...
 
 ## Orchestration
 
+Consider a scenario where we receive an API request, perform some tasks and then call another API which does some async work resulting in a message on one or more service bus queues. Maybe in our contrived WeatherReport scenario, we need to send the generated weather report to be modelled by some other system. We can now create something like the following:
+```csharp
+public class WeatherReportOrchestrator: IWeatherReportOrchestrator,
+            EventHandler<WeatherReportModellingSucceededEvent>, EventHandler<WeatherReportModellingFailedEvent>
+{
+    public async Task<OneOf<WeatherReport, Failure>> HandleApiPostRequest(string requestedRegion, DateTime requestedDate)
+    {
+        return await WeatherReportDetails.FromRequest(requestedRegion, requestedDate)
+            .Then(regionValidator.ValidateRegion)
+            .Then(dateChecker.CheckDate)
+            .Then(CheckCache)
+            .Then(weatherForecastGenerator.Generate)
+            .Then(reportPersistenceService.Save)
+            .Then(weatherReportModellingClient.RequestModelling())
+    }
+
+    public async Task HandleEvent(WeatherReportModellingSucceededEvent modellingSucceededEvent)
+    {
+        logger.LogModellingSucceededEventReceived();
+
+        var result = await WeatherReportDetails.FromModellingEvent(modellingSucceededEvent)
+            .Then(reportPersistenceService.Fetch)
+            .Then(reportPersistenceService.UpdateStatusModellingSucceeded)
+            .Then(weatherReportPublisher.Publish);
+
+        if (result.IsT1)
+            throw new Exception($"Something went wrong while handling {nameof(WeatherReportModellingSucceededEvent)}");
+    }
+
+    public async Task HandleEvent(WeatherReportModellingFailedEvent modellingFailedEvent)
+    {
+        logger.LogModellingFailedEventReceived();
+
+        var result = await WeatherReportDetails.FromModellingEvent(modellingFailedEvent)
+            .Then(reportPersistenceService.Fetch)
+            .Then(details => reportPersistenceService.UpdateStatusModellingFailed(details, modellingFailedEvent.GetFailureReason()));
+
+        if (result.IsT1)
+            throw new Exception($"Something went wrong while handling {nameof(WeatherReportModellingSucceededEvent)}");
+    }
+}
+```
+
 ### Steps / rules
 
 Use `Failure : OneOfBase<ApiFailure, MessageHandlerFailure>` etc
@@ -71,15 +114,16 @@ Details / routing slip class, success using a record. Shared or one per flow?
 
 ### Organisation
 
-orchestrator per vertical slice
+orchestrator per vertical slice or usecase or version etc
 
 ## Pros and Cons
 
 ### Pros
 
 * Really easy to see whats going on and across synchonous and asynchonous flows i.e. synchronous API handler => asynchronous message bus handler etc.
-* Really wasy to navigate around the code `[ctrl]+[f12]` straight into any chained method.
-* Ability to split a flow e.g. in two in order to scale a component identified as a bottleneck.
+* Really easy to navigate around the code `[ctrl]+[f12]` straight into any chained method.
+* Really easy to debug by placing breakpoints inside any chained method, or step through the `Then` extension method for the thourough version!
+* Ability to split a flow e.g. in two in order to scale out a component identified as a bottleneck.
 
 ### Cons
 
