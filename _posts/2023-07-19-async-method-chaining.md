@@ -38,9 +38,9 @@ Initially, we considered using MediatR to refactor our logic, but it seemed over
 
 A long while ago I did some work with Windows Workflow Foundation, which I really enjoyed. Code would be organised into functional chunks called Activities, each having In arguments, Out arguments and sometimes InOut arguments. The Activities would be arranged in a visual workflow, so the flow and ordering was really obvious. The striking thing about it, was that new team members could instantly find their way around and once inside an Activity it was immediately obvious what the scope of the task was, what inputs were available to use and what outputs would need to be set. 
 
-I wanted to find a way to replicate this declarative flow and a flavour of the functional isolation, because I want engineers to easily see whats going on and find their way around. Our final solution shows the flow declaratively in once place and `[ctrl]+[f12]` takes you straight to the code in Visual Studio!
+I wanted to find a way to replicate this declarative flow and a flavour of the functional isolation, because I want engineers to easily see what's going on and find their way around. Our final solution shows the flow declaratively in one place and `[ctrl]+[f12]` takes you straight to the code in Visual Studio!
 
-## How its used
+## How it's used
 
 Here is the full version of the contrived WeatherReportRequestHandler example shown above:
 ```csharp
@@ -74,13 +74,13 @@ public class GetWeatherReportRequestHandler : IGetWeatherReportRequestHandler
     }
 }
 ```
-A static method named `Create()` returns an initialised `WeatherReport` object, but it actually returns a `Task<oneOf<WeatherReport, Failure>>` we'll see why in a moment. The `WeatherReport` object contains any required state and crucially represents Success when returned.
+A static method named `Create()` returns an initialised `WeatherReport` object, but it actually returns a `Task<OneOf<WeatherReport, Failure>>` we'll see why in a moment. The `WeatherReport` object contains any required state and crucially represents Success when returned.
 
-To be chained, a method need only have the correct return type, in this case a `Task<OneOf<WeatherReport, Failure>>`. The chained method will probably recieve a `WeatherReport` as an argument so it can read some state, perform its task, possibly set some resulting state and then crucially it should return the `WeatherReport` object if sucessful _or_ a derrivative of `Failure` if not. 
+To be chained, a method need only have the correct return type, in this case a `Task<OneOf<WeatherReport, Failure>>`. The chained method will probably receive a `WeatherReport` as an argument so it can read some state, perform its task, possibly set some resulting state and then crucially it should return the `WeatherReport` object if successful _or_ a derivative of `Failure` if not. 
 
 Note the methods can live anywhere, they might be local or live on services injected from IoC, they just need the correct signature.
 
-The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<oneOf<T, TFailure>>` in the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<oneOf<WeatherReport, Failure>>`. The compiler infers what the Types `T` and `TFailure` are from the first method in the chain.
+The chaining is possible because of an extension method named `Then` (shown below) which extends a `Task<OneOf<T, TFailure>>`. In the case above the `T` is the `WeatherReport` and `TFailure` is the `Failure` class mentioned above. This is why the `Create()` method and all of the other methods in the chain must return `Task<OneOf<WeatherReport, Failure>>`. The compiler infers what the Types `T` and `TFailure` are from the first method in the chain.
 
 In this version you can see the `WeatherReport` variable named `report` being explicitly passed into each chained method, if the chained methods only have a single `T` argument then you can use the C# feature method group conversion to delegate, making the code even more terse and easily readable: 
 ```csharp
@@ -121,13 +121,13 @@ public static async Task<OneOf<T, TFailure>> Then<T, TFailure>(
 ```
 So the first job is to inspect the result of the previous job in the chain, we await it, but are pretty sure that its already been awaited and therefore the Result is already available. Note this is fine because we are using the full blown `Task`, if it were `ValueTask` we would not be able to await a second time. The OneOf library has methods for us to determine if if the Result contains the `T` (`WeatherReport` in this case) or `TFailure` (a `Failure` in this case). `IsT0()` will return true if the object contains the first possiblity in the discriminated union, `IsT1()` will return true for the second item etc. 
 
-If the result contains a `TFailure` from eariler in the chain we _immediately_ return that `Failure` _without_ performing our Task, all of the following `Then's` in the chain do the same. This means the first `Failure` returned by a chained task is returned and no more chained tasks are executed.
+If the result contains a `TFailure` from earlier in the chain we _immediately_ return that `Failure` _without_ performing our Task, all of the following `Then's` in the chain do the same. This means the first `Failure` returned by a chained task is returned and no more chained tasks are executed.
 
-Otherwise if the Result was sucessful, which means it contained a `T` (`WeatherReport` in this case) then we should call and await the `Func` `nextJob` passing in the `T` (`Weatherreport` in this case). This is how the chain is continued.
+Otherwise if the Result was successful, which means it contained a `T` (`WeatherReport` in this case) then we should call and await the `Func` `nextJob` passing in the `T` (`WeatherReport` in this case). This is how the chain is continued.
 
 ### What if something goes wrong?
 
-We had a case where we were creating two transactions, one after the other in the chain, but if the first succeeded and the second failed, we needed a way to cancel the first transaction. Initally this code was hidden in the second transaction creation method, but a team member pointed out that was counter-intuitive. To solve this problem a second overload of the `Then` method is provided which takes a second Func called `onFailure` as an argument. We inspect the Result of `nextJob` in the same way and it it fails, we invoke and await `onFailure` before returning the `TFailure` as before.
+We had a case where we were creating two transactions, one after the other in the chain, but if the first succeeded and the second failed, we needed a way to cancel the first transaction. Initially this code was hidden in the second transaction creation method, but a team member pointed out that was counter-intuitive. To solve this problem a second overload of the `Then` method is provided which takes a second Func called `onFailure` as an argument. We inspect the Result of `nextJob` in the same way and if it fails, we invoke and await `onFailure` before returning the `TFailure` as before.
 
 Here is the overload of the extension method `Then` with `onFailure`:
 ```csharp
@@ -170,6 +170,6 @@ We also have a method named `IfThen()` which takes an additional `func<T, bool>`
 
 So if you also have multiple tasks to perform off the back of an API request or when handling a Service Bus message etc, maybe consider this method of chaining methods together. Maintain a single return path, place the methods wherever they best fit and make life easy for your team by expressing declaratively the flow of tasks with super-easy code navigation. 
 
-This code is avilable in a [Nuget package]() and in this [GitHib repository](https://github.com/andrewjpoole/OneOf.Chaining), but its basically a few small extension methods, so copy/paste away!
+This code is avilable in a [Nuget package](https://www.nuget.org/packages/OneOf.Chaining) and in this [GitHib repository](https://github.com/andrewjpoole/OneOf.Chaining), but its basically a few small extension methods, so copy/paste away!
 
 Hope you found this interesting, thanks for reading :)
