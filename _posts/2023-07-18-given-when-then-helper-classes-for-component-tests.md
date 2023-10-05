@@ -68,7 +68,7 @@ In the above example, the whole `Then` section is wrapped in a `using (new Asser
 
 ### Shared stuff
 
-All three classes share an instance of whatever owns the Mocks and useful properties or fields, lets call this the context. Each class has a static method `UsingThe()` which assigns this shared state object and returns a new `Given`, `When` or `Then`. Each class also has a dummy `And` property which just returns itself meaning the tests read more like English sentances.
+All three classes share an instance of whatever owns the Mocks and useful properties or fields, let's call this the context. Each class has a static method `UsingThe()` which assigns this shared state object and returns a new `Given`, `When` or `Then`. Each class also has a dummy `And` property which just returns itself meaning the tests read more like English sentences.
 
 ### Out variables!
 
@@ -76,7 +76,7 @@ So no-one likes out variables, myself included, but here they offer a way of def
 
 ### Some code
 
-Simplified example `Given`, `When` and `Then` classes are included below to get you going. These classes are necessarily specific to the app under test, so we find we start from scratch each time, here is [a handly gist](https://gist.github.com/andrewjpoole/039ae07be0bc3534cda6383780d5a945) containing the bare bones classes ready to add methods to.
+Simplified example `Given`, `When` and `Then` classes are included below to get you going. These classes are necessarily specific to the app under test, so we find we start from scratch each time, here is [a handy gist](https://gist.github.com/andrewjpoole/039ae07be0bc3534cda6383780d5a945) containing the bare bones classes ready to add methods to.
 
 Here is an example of a Given class with methods for setting up testing an API:
 ```csharp
