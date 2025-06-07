@@ -5,30 +5,29 @@ image: /images/testing-ai-generated-1.png
 published: true
 ---
 
-# Integration Tests: How Not to Hate Them ❤️ 
-## Assert against trace data for integration tests with .Net Aspire and the QueryableTraceCollector
+# Integration Tests: How Not to Hate Them ❤️
 
 ### TL/DR;
 
-Recently while preparing for a talk on integration tests, I tried a few things and discovered something I think is potentially game changing-> Asserting against open telemetry trace data for integration tests! This makes the tests less complex and less brittle, easier to run locally and will probably make your systems easier to support by temping you to add better telemetry earier on in the dev loop! Basically a win-win-win-win - perhaps you should read on?🧐
+Recently while preparing for a talk on integration tests, I tried a few things and discovered something I think is potentially game changing; asserting against open telemetry trace data for integration tests! This makes the tests less complex and less brittle, easier to run locally and will probably make your systems easier to support by temping you to add better telemetry earlier on in the dev loop! Basically a win-win-win-win...🧐
 
 ## Background
 
-I have always disliked integration tests because they expose just how hard it can be to run a modern distributed app locally, especially in a team scenario where people have differing preferences of tooling/setup/even OS! So we often give up on running integration tests locally altogether and end up relying on the integration tests passing in an environment... after a release... after a CI build... after we have checked in our change and hoped for the best! This is not an ideal feedback loop and could easily take 30mins+ ☹️
+I have always disliked integration tests because they expose just how hard it can be to run a modern distributed app locally, especially in a team scenario where people have differing preferences of tooling/setup/even OS! So we often give up on running integration tests locally altogether and end up relying on the integration tests passing in an environment... after a release... after a CI build... after we have checked in our change and hoped for the best! This is not an ideal feedback loop and could easily take 30mins+ ☹️😫😪😴
 
-The other thing which annoys me about integration tests is having to assert in several ways against various things to ensure the expected behaviour happened, E.g. using database connections to query or asb queues for assertions. Its possible of course, but think of the case of a message broker like Azure Service Bus, we need to peek at a queue to ensure first no old messages exist, then again at the opportune moment to assert that the expected message has appeared, then after the correct amount of time has passed we check again to see that the message has dissapeared, but we also need to check that it didn't appear in the dead letter queue! Even after that we still aren't certain that it was processed unless we check some other outcome like a domain event was persisted or other db update occured etc. The dance of timing here certainly plays a part in these kinds of tests being notoriously brittle. There must be a better way...
+The other thing which annoys me about integration tests is having to assert in several ways against various different things to ensure the expected behaviour happened, E.g. using database connections to query or asb queues for assertions. Its possible of course, but think of the case of a message broker like Azure Service Bus, we need to peek at a queue to ensure first no old messages exist, then again at the right moment to assert that the expected message has appeared, then after the correct amount of time has passed we check again to see that the message has dissapeared, but we also need to check that it didn't appear in the dead letter queue! Even after that we still aren't certain that it was processed unless we check some other outcome like a domain event was persisted or other db update occured etc. The dance of timing here certainly plays a part in these kinds of tests being notoriously brittle. There must be a better way...
 
 Clearly the effort required to get integration tests running locally is worthwhile and my talk set out to make that case and provide a few tips.
 
 ## Enter .Net Aspire for Exceptional Local Development Experience!
 
-[.NET Aspire](https://github.com/dotnet/aspire) has been developed to solve the exact problem of running distributed apps locally and it was on my list to try anyway. Aspire allows us to define our services in terms of executable apps, services, configuration and the relationships between them all. This is also done in one single file - amazing! There are lots of excellent resources on what Aspire is and how to use it to orchestrate a distributed app, from here I wil concentrate specifically how it can help with integration tests.
+[.NET Aspire](https://github.com/dotnet/aspire) has been developed to solve the exact problem of running distributed apps locally and it was on my list to try anyway. Aspire allows us to define our services in terms of executable apps, services, configuration and the relationships between them all. This is also done in one single file - amazing! There are lots of excellent resources on what Aspire is and how to use it to orchestrate a distributed app, from here I will concentrate specifically how it can help with integration tests.
 
 ## Open telemetry
 
-Aspire also wires up all of the resources to send [Open Telemetry](https://opentelemetry.io/) data to the dashboard where it can be viewed and filtered while the app is running locally. The value of this can not be understated, once we start using this data to see whats happening and inspect what's gone before, it becomes addictive, we start having realisations like "if we could add that piece of data to this trace, then we'd save x minutes looking it up from 3 db queries, if scenario y ever happens" To have this kind of view of an app, at this early a stage in the development loop is amazing! See below for code to add custom trace data to a process or to bridge a process gap.
+Aspire also wires up all of the resources to send [Open Telemetry](https://opentelemetry.io/) data to the dashboard where it can be viewed and filtered while the app is running locally. The value of this can not be understated. Once we start using this data to see whats happening and inspect what's gone before, it becomes addictive, we start having realisations like "if we could add that piece of data to this trace, then we'd save x minutes looking it up from 3 db queries during an incident if scenario y ever happens". To have _this_ kind of view of an app, at _this_ early a stage in the development loop is amazing! See below for code to add custom trace data to a process or to bridge a process gap.
 
-![trace data in Aspire dashboard](../images/open-telemetry-trace-data-aspire-dashboard.png)
+![trace data in Aspire dashboard](/images//open-telemetry-trace-data-aspire-dashboard.png)
 
 ## Aspire Tests
 
@@ -280,7 +279,7 @@ var responseJson = await response.Content.ReadAsStringAsync();
 JsonSerializer.Deserialize<TraceData[]>(responseJson, JsonSerializerOptions.Web ).Display();
 ```
 
-![image](../images/queryabletracecollector-polyglotnotebook-customise-output.png)
+![image](/images//queryabletracecollector-polyglotnotebook-customise-output.png)
 
 Which makes it much easier to spot thing things that matter.
 
