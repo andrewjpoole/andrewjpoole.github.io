@@ -13,7 +13,7 @@ Recently while preparing for a talk on integration tests, I tried a few things a
 
 ## Background
 
-I have always disliked integration tests because they expose just how hard it can be to run a modern distributed app locally, especially in a team scenario where people have differing preferences of tooling/setup/even OS! So we often give up on running integration tests locally altogether and end up relying on the integration tests passing in an environment... after a release... after a CI build... after we have checked in our change and hoped for the best! This is not an ideal feedback loop and could easily take 30mins+ ☹️😫😪😴
+I have always disliked integration tests because they expose just how hard it can be to run a modern distributed app locally, especially in a team scenario where people have differing preferences of tooling/setup/even OS! So we often give up on running integration tests locally altogether and end up relying on the integration tests passing in an environment... after a release... after a CI build... after we have checked in our change and hoped for the best! This is not an ideal feedback loop and could easily take 30mins+ 🥱
 
 The other thing which annoys me about integration tests is having to assert in several ways against various different things to ensure the expected behaviour happened, E.g. using database connections to query or asb queues for assertions. Its possible of course, but think of the case of a message broker like Azure Service Bus, we need to peek at a queue to ensure first no old messages exist, then again at the right moment to assert that the expected message has appeared, then after the correct amount of time has passed we check again to see that the message has dissapeared, but we also need to check that it didn't appear in the dead letter queue! Even after that we still aren't certain that it was processed unless we check some other outcome like a domain event was persisted or other db update occured etc. The dance of timing here certainly plays a part in these kinds of tests being notoriously brittle. There must be a better way...
 
@@ -31,17 +31,17 @@ Aspire also wires up all of the resources to send [Open Telemetry](https://opent
 
 ## Aspire Tests
 
-Aspire also supports testing a distributed app using the same orchestration code, meaning that when an Aspire test is run, the same dependencies get started, the same service discovery and configuration happens and we get the opportunity to create clients to our services and call APIs or send messages etc. These tests take quite a while to run due to the nature of whats actually being spun up, but they are much faster than waiting for the check-in -> CI build -> release to env -> run tests loop.
+Aspire also supports testing a distributed app using the same orchestration code, meaning that when an Aspire test is run, the same dependencies get started, the same service discovery and configuration happens and we get the opportunity to create clients to our services and call APIs or send messages etc. These tests take quite a while to run due to the nature of whats actually being spun up, but they are much faster than waiting for the check-in -> CI build -> release to env -> run tests loop. Official docs [here](https://learn.microsoft.com/en-us/dotnet/aspire/testing/overview).
 
 ## A Eureka moment!💡
 
-So at this moment, while experimenting with Aspire tests, it dawned on me that all that lovely trace data would be absolutely perfect for asserting that expected behaviour ocurred as expected, its a forensic single-source-of-truth timeline of everything that happened since the app started!
+So at this moment, while experimenting with Aspire tests, it dawned on me that all that lovely trace data would be absolutely perfect for asserting that expected behaviour ocurred as expected, its a forensic single-source-of-truth timeline of everything that happened since the app started! In other words the perfect thing to assert against!😃
 
 Alas I also realised a few things:
 
-There are some differences between Aspire tests the Aspire localdev 'F5' experience, one being that the dashboard doesn't run during tests. The dashboard is the component that collects open telemetry data, all other orchestrated services are configured to send their telemetry data to the dashboard via gRPC. If the dashboard doesn't run during tests, then nothing is listening to collect the trace data☹️
+There are some differences between Aspire tests the Aspire localdev 'F5' experience, one being that the dashboard doesn't run during tests. The dashboard is the component that collects open telemetry data, all other orchestrated services are configured to send their telemetry data to the dashboard via gRPC. If the dashboard doesn't run during tests, then nothing is listening to collect the trace data.☹️
 
-Now it is possible to configure that dashboard to run during tests, but there are no public endpoints available with which to query the data. Again it is possible to use reflection to get access to the private view model, but I was unable to get that to work.
+Now it is possible to configure that dashboard to run during tests, but there are no public endpoints available with which to query the data. Again it is possible to use reflection to get access to the private view model, but I was unable to get that to work.😕
 
 ## Asserting against trace data!🚀
 
@@ -62,14 +62,14 @@ So, after some experiementation, the simplest solution I could come up with is:
 
 ## Filling in some trace data gaps⛳
 
-I noticed that in a coupld of places I was missing vital info about what had happened, I was looking at this from a 'what would be ideal to assert against' point of view, but 'what would be helpful when investigating an incident' is another equally valid and useful one.
+I noticed that in a couple of places I was missing vital info about what had happened, I was looking at this from a 'what would be ideal to assert against' point of view, but 'what would be helpful when investigating an incident' is another equally valid and useful one.
 
 ### NotificationService
 
 In my dummy Notification Service, I did not have any trace data showing me when the notification is 'made', because being a dummy app, it was not doing anything which is automatically traced (i.e. making an API call, sending a message or calling the database), so I added the following code:
 
 ```csharp
-using (var activity = Activity.StartActivity("User Notication Sent", ActivityKind.Producer))
+using (var activity = Activity.StartActivity("User Notification Sent", ActivityKind.Producer))
 {
     activity?.SetTag("user-notification-event.body", @event.Body);
     activity?.SetTag("user-notification-event.reference", @event.Reference);
@@ -168,7 +168,7 @@ public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) w
     builder.AddOpenTelemetryExporters();
 
     // Filter collected trace data by DisplayName to just the bits we're interested in, these can also be wired up through config instead if you prefer...
-    builder.Services.AddQueryableOtelCollectorExporter(builder.Configuration, ["Outbox Item Insertion", "User Notication Sent", "Domain Event Insertion"]); 
+    builder.Services.AddQueryableOtelCollectorExporter(builder.Configuration, ["Outbox Item Insertion", "User Notification Sent", "Domain Event Insertion"]); 
 
     return builder;
 }
@@ -196,7 +196,7 @@ public void PostWeatherData_EventuallyResultsIn_AUserNotificationBeingSent2()
 
     then.TheResponseShouldBe(response, HttpStatusCode.OK);
             
-    when.WeWaitWhilePollingForTheNotificationTrace(queryableTraceCollectorClient, 9, "User Notication Sent", out var traces);
+    when.WeWaitWhilePollingForTheNotificationTrace(queryableTraceCollectorClient, 9, "User Notification Sent", out var traces);
         
     then.WeAssertAgainstTheTraces(traces, traces => 
     {
@@ -206,7 +206,7 @@ public void PostWeatherData_EventuallyResultsIn_AUserNotificationBeingSent2()
         
         traces.AssertContainsDisplayName("Outbox Item Insertion");
 
-        traces.AssertContains(t => t.DisplayName == "User Notication Sent"
+        traces.AssertContains(t => t.DisplayName == "User Notification Sent"
             && t.ContainsTag("user-notification-event.body", x => x == "Dear user, your data has been submitted and included in our latest model")
             && t.ContainsTag("user-notification-event.reference", x => x == reference), 
             "Didn't find the expected user notification trace with the expected tags.");            
@@ -218,7 +218,7 @@ That might seem like a large test for a blog post, but consider that it is testi
 
 ### Bonus tip #1 - If you need to ensure that an API call is _not_ traced
 
-You can just create a DelegatingHandler which literally nulls the current Activity. I use this to ensure that calls to QueryableTraceCollector are not themselves traced, otherwise we end up with infinaite loops, ask me how I know 🤣
+You can just create a DelegatingHandler which literally nulls the current Activity. I use this to ensure that calls to QueryableTraceCollector are not themselves traced, otherwise we end up with infinite loops, ask me how I know 🤣
 
 ```csharp
 public class ClientHandlerWithTracingDisabled : DelegatingHandler
@@ -240,7 +240,7 @@ public class ClientHandlerWithTracingDisabled : DelegatingHandler
 ```
 ### Bonus tip #2 - Customise display for demos
 
-Recently I have been using VSCode for as much as possible and in perticular Polyglot Notebooks for demonstrations. The Http cells are great, but for querying the QueryableTraceCollector's API I have been using a CSharp cell where I can add an overriden ToString() method and customise the output using emojis like this:
+Recently I have been using VSCode for as much as possible and in particular Polyglot Notebooks for demonstrations. The Http cells are great, but for querying the QueryableTraceCollector's API I have been using a CSharp cell where I can add an overridden `ToString()` method and customise the output using emojis like this:
 
 ```csharp
 // contents of CSharp Cell in Polyglot notebook
@@ -262,7 +262,7 @@ public class TraceData
         if(DisplayName == "Domain Event Insertion")
             thirdPart = Tags["domain-event.eventclassName"].ToString().Split('.').LastOrDefault();
 
-        if(DisplayName == "User Notication Sent")
+        if(DisplayName == "User Notification Sent")
             thirdPart = $"✉️ reference: {Tags["user-notification-event.reference"].ToString()}";
 
         if(DisplayName == "Outbox Item Insertion")
@@ -281,7 +281,7 @@ JsonSerializer.Deserialize<TraceData[]>(responseJson, JsonSerializerOptions.Web 
 
 ![image](/images//queryabletracecollector-polyglotnotebook-customise-output.png)
 
-Which makes it much easier to spot thing things that matter.
+Which makes it much easier to spot things that matter.
 
 ## Conclusions
 
