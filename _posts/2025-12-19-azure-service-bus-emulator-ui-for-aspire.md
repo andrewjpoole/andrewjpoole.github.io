@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Introducing the Aspire ASB Emulator UI"
-categories: [Aspire, Azure Service Bus, Blazor, .NET]
-tags: [aspire, azure-service-bus, blazor, tools]
+title: "Introducing the Azure Service Bus Emulator UI"
+categories: [Azure Service Bus, Aspire, Blazor, .NET]
+tags: [azure service bus ui, asb UI, asb gui, aspire, azure-service-bus, tools]
 image: /images//asb-emulator-ui-title.png
 published: true
 ---
